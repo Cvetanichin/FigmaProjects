@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HERA Media Impact Dashboard — Building a Community of Human Rights Defenders</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple: #A079AE;
+  --purple-light: #C9A8D4;
+  --purple-dark: #7A558A;
+  --coral: #F09E9F;
+  --coral-dark: #D4747A;
+  --gold: #E5C690;
+  --cream: #EAD9CB;
+  --blue: #93B3C1;
+  --deep-blue: #6890AC;
+  --bg: #F6EFEA;
+  --white: #FFFFFF;
+  --text: #3D2E3F;
+  --text-light: #7A6B80;
+  --border: rgba(160,121,174,0.15);
+  --shadow: 0 4px 20px rgba(160,121,174,0.12);
+  --shadow-hover: 0 8px 32px rgba(160,121,174,0.22);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; }
+
+/* ── NAV ── */
+.nav { position:sticky; top:0; z-index:100; background:rgba(255,255,255,0.96); backdrop-filter:blur(10px);
+  border-bottom:2px solid var(--border); display:flex; align-items:center; gap:4px; padding:0 24px; box-shadow:var(--shadow); }
+.nav-brand { font-family:'Playfair Display',serif; font-weight:700; color:var(--purple); font-size:1.05em;
+  padding:14px 0; margin-right:auto; white-space:nowrap; }
+.nav-brand span { color:var(--coral); }
+.nav-tab { padding:16px 14px; font-size:0.82em; font-weight:600; color:var(--text-light); cursor:pointer;
+  border-bottom:3px solid transparent; transition:all .2s; white-space:nowrap; letter-spacing:.3px; }
+.nav-tab:hover { color:var(--purple); }
+.nav-tab.active { color:var(--purple); border-bottom-color:var(--purple); }
+.nav-badge { display:inline-block; background:var(--coral); color:#fff; border-radius:10px; font-size:0.7em;
+  padding:1px 6px; margin-left:4px; vertical-align:middle; }
+
+/* ── PAGES ── */
+.page { display:none; padding:28px 28px 48px; max-width:1440px; margin:0 auto; }
+.page.active { display:block; }
+
+/* ── HERO HEADER ── */
+.hero { background:linear-gradient(135deg,var(--purple) 0%,var(--deep-blue) 100%); border-radius:16px;
+  padding:36px 40px; color:#fff; margin-bottom:28px; position:relative; overflow:hidden; }
+.hero::after { content:''; position:absolute; right:-60px; top:-60px; width:300px; height:300px;
+  border-radius:50%; background:rgba(255,255,255,0.06); }
+.hero h1 { font-family:'Playfair Display',serif; font-size:1.9em; font-weight:700; margin-bottom:6px; position:relative; }
+.hero p { opacity:.82; font-size:.95em; max-width:600px; line-height:1.6; position:relative; }
+.hero-meta { display:flex; gap:24px; margin-top:18px; position:relative; }
+.hero-chip { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); border-radius:20px;
+  padding:4px 14px; font-size:.8em; font-weight:500; }
+
+/* ── KPI GRID ── */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:18px; margin-bottom:28px; }
+.kpi-card { background:#fff; border-radius:14px; padding:24px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+  transition:transform .25s,box-shadow .25s; border-top:4px solid var(--purple-light); }
+.kpi-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-hover); }
+.kpi-card.primary { border-top-color:var(--purple); }
+.kpi-card.coral { border-top-color:var(--coral); }
+.kpi-card.blue { border-top-color:var(--deep-blue); }
+.kpi-card.gold { border-top-color:var(--gold); }
+.kpi-icon { font-size:1.5em; margin-bottom:10px; }
+.kpi-value { font-family:'Playfair Display',serif; font-size:2.4em; font-weight:700; color:var(--purple); line-height:1; }
+.kpi-card.coral .kpi-value { color:var(--coral-dark); }
+.kpi-card.blue .kpi-value { color:var(--deep-blue); }
+.kpi-card.gold .kpi-value { color:#B8912A; }
+.kpi-label { font-size:.8em; color:var(--text-light); text-transform:uppercase; letter-spacing:.8px; font-weight:600; margin:6px 0 12px; }
+.kpi-sub { font-size:.82em; color:var(--text-light); }
+.mini-bar { height:6px; background:#EEE; border-radius:4px; overflow:hidden; margin-top:8px; }
+.mini-bar-fill { height:100%; border-radius:4px; transition:width 1.2s ease; }
+
+/* ── GAUGE ── */
+.gauge-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.gauge-svg { width:200px; height:110px; }
+
+/* ── SECTION TITLE ── */
+.section-head { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.section-head h2 { font-family:'Playfair Display',serif; font-size:1.3em; color:var(--purple); font-weight:700; }
+.section-head p { font-size:.85em; color:var(--text-light); margin-left:auto; font-style:italic; }
+.divider { width:40px; height:3px; background:linear-gradient(90deg,var(--purple),var(--coral)); border-radius:2px; margin-bottom:20px; }
+
+/* ── GRID LAYOUTS ── */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:24px; }
+.grid-auto { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:20px; margin-bottom:24px; }
+@media(max-width:900px){ .grid-2,.grid-3 { grid-template-columns:1fr; } }
+
+/* ── CHART CARD ── */
+.chart-card { background:#fff; border-radius:14px; padding:24px; box-shadow:var(--shadow); }
+.chart-card h3 { font-size:.95em; font-weight:600; color:var(--purple); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+.chart-wrap { position:relative; height:260px; }
+.chart-wrap.tall { height:340px; }
+.chart-wrap.sm { height:200px; }
+
+/* ── TABLE ── */
+.table-wrap { background:#fff; border-radius:14px; padding:24px; box-shadow:var(--shadow); overflow:hidden; }
+.table-toolbar { display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+.search-box { flex:1; min-width:200px; padding:10px 14px; border:1.5px solid var(--border); border-radius:8px;
+  font-family:inherit; font-size:.88em; outline:none; transition:border .2s; }
+.search-box:focus { border-color:var(--purple); }
+.filter-select { padding:10px 14px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit;
+  font-size:.88em; outline:none; background:#fff; cursor:pointer; }
+.filter-select:focus { border-color:var(--purple); }
+table { width:100%; border-collapse:collapse; font-size:.87em; }
+thead th { padding:11px 14px; text-align:left; font-size:.78em; text-transform:uppercase; letter-spacing:.6px;
+  color:var(--text-light); border-bottom:2px solid #F0E8F2; font-weight:600; }
+tbody tr { transition:background .15s; cursor:pointer; }
+tbody tr:hover { background:#FAF5FC; }
+tbody td { padding:11px 14px; border-bottom:1px solid #F5F0F7; vertical-align:middle; }
+.story-link { color:var(--deep-blue); text-decoration:none; font-weight:500; }
+.story-link:hover { color:var(--purple); text-decoration:underline; }
+.badge { display:inline-block; border-radius:12px; padding:3px 10px; font-size:.75em; font-weight:600; }
+.badge-purple { background:#EDE2F5; color:var(--purple-dark); }
+.badge-coral { background:#FDE8E8; color:var(--coral-dark); }
+.badge-blue { background:#DCE9F5; color:var(--deep-blue); }
+.badge-gold { background:#F5EDDC; color:#8A6620; }
+.badge-green { background:#E2F5EC; color:#2A7A52; }
+.reach-num { font-family:'Playfair Display',serif; font-weight:600; color:var(--purple); }
+.gender-bar { display:flex; height:8px; border-radius:4px; overflow:hidden; width:80px; }
+.gender-bar .f { background:var(--purple); }
+.gender-bar .m { background:var(--blue); }
+.gender-bar .u { background:var(--cream); }
+.rag { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; }
+.rag-g { background:#4CAF50; }
+.rag-a { background:#FF9800; }
+.rag-r { background:#F44336; }
+
+/* ── INDICATOR CARDS ── */
+.indicator-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; }
+.indicator-card { background:#fff; border-radius:14px; padding:22px; box-shadow:var(--shadow);
+  border-left:4px solid var(--purple-light); transition:transform .2s; }
+.indicator-card:hover { transform:translateY(-2px); }
+.indicator-card.on-track { border-left-color:#4CAF50; }
+.indicator-card.amber { border-left-color:#FF9800; }
+.indicator-card.at-risk { border-left-color:#F44336; }
+.ind-code { font-size:.75em; color:var(--text-light); font-weight:700; letter-spacing:.8px; text-transform:uppercase; margin-bottom:4px; }
+.ind-title { font-weight:600; font-size:.95em; color:var(--text); margin-bottom:12px; line-height:1.4; }
+.ind-progress { height:10px; background:#EEE; border-radius:6px; overflow:hidden; margin:10px 0; }
+.ind-fill { height:100%; border-radius:6px; transition:width 1.4s cubic-bezier(.34,1.56,.64,1); }
+.ind-fill.green { background:linear-gradient(90deg,#81C784,#4CAF50); }
+.ind-fill.orange { background:linear-gradient(90deg,#FFB74D,#FF9800); }
+.ind-fill.red { background:linear-gradient(90deg,#E57373,#F44336); }
+.ind-fill.purple { background:linear-gradient(90deg,var(--purple-light),var(--purple)); }
+.ind-stats { display:flex; gap:16px; font-size:.82em; }
+.ind-stat { display:flex; flex-direction:column; }
+.ind-stat span:first-child { color:var(--text-light); font-size:.85em; }
+.ind-stat span:last-child { font-weight:600; color:var(--text); }
+
+/* ── SCENARIO TOOL ── */
+.scenario-card { background:#fff; border-radius:14px; padding:28px; box-shadow:var(--shadow); margin-bottom:24px; }
+.slider-group { margin-bottom:20px; }
+.slider-label { display:flex; justify-content:space-between; font-size:.88em; margin-bottom:8px; }
+.slider-label span:first-child { font-weight:500; color:var(--text); }
+.slider-label span:last-child { font-weight:700; color:var(--purple); }
+input[type=range] { width:100%; accent-color:var(--purple); cursor:pointer; }
+.scenario-result { background:linear-gradient(135deg,#F8F0FC,#EDE2F5); border-radius:10px; padding:20px;
+  display:flex; gap:24px; flex-wrap:wrap; margin-top:16px; }
+.scenario-stat { flex:1; min-width:140px; }
+.scenario-stat .label { font-size:.78em; color:var(--text-light); font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+.scenario-stat .value { font-family:'Playfair Display',serif; font-size:1.8em; color:var(--purple); font-weight:700; }
+.scenario-stat .note { font-size:.8em; color:var(--text-light); }
+
+/* ── TOP STORIES ── */
+.top-story-card { background:#fff; border-radius:14px; padding:18px; box-shadow:var(--shadow);
+  display:flex; align-items:center; gap:14px; margin-bottom:12px; transition:transform .2s,box-shadow .2s; }
+.top-story-card:hover { transform:translateX(4px); box-shadow:var(--shadow-hover); }
+.top-rank { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-family:'Playfair Display',serif; font-weight:700; font-size:1em; flex-shrink:0; }
+.rank-1 { background:linear-gradient(135deg,#FFD700,#FFA500); color:#fff; }
+.rank-2 { background:linear-gradient(135deg,#C0C0C0,#A0A0A0); color:#fff; }
+.rank-3 { background:linear-gradient(135deg,#CD7F32,#A0522D); color:#fff; }
+.rank-n { background:var(--cream); color:var(--purple-dark); }
+.top-story-info { flex:1; }
+.top-story-info h4 { font-size:.9em; font-weight:600; color:var(--text); line-height:1.3; margin-bottom:3px; }
+.top-story-info small { font-size:.78em; color:var(--text-light); }
+.top-story-reach { text-align:right; flex-shrink:0; }
+.top-story-reach strong { font-family:'Playfair Display',serif; font-size:1.15em; color:var(--purple); display:block; }
+.top-story-reach small { font-size:.75em; color:var(--text-light); }
+
+/* ── INSIGHT CARDS ── */
+.insight-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+.insight-card { background:#fff; border-radius:12px; padding:20px; box-shadow:var(--shadow);
+  border-top:3px solid var(--purple-light); }
+.insight-card.alert { border-top-color:var(--coral); }
+.insight-card.warning { border-top-color:var(--gold); }
+.insight-card.success { border-top-color:#4CAF50; }
+.insight-card h4 { font-size:.92em; font-weight:700; color:var(--purple); margin-bottom:10px; }
+.insight-card.alert h4 { color:var(--coral-dark); }
+.insight-card.warning h4 { color:#8A6620; }
+.insight-card.success h4 { color:#2A7A52; }
+.insight-card p, .insight-card li { font-size:.84em; color:var(--text-light); line-height:1.55; }
+.insight-card ul { padding-left:16px; }
+.insight-card li { margin-bottom:5px; }
+.insight-card li strong { color:var(--text); }
+
+/* ── HEATMAP ── */
+.heatmap-table { width:100%; border-collapse:collapse; font-size:.82em; }
+.heatmap-table th { padding:8px 10px; text-align:center; color:var(--text-light); font-weight:600; font-size:.8em; }
+.heatmap-table td { padding:8px 10px; text-align:center; border-radius:4px; font-weight:600; }
+.heat-0 { background:#F5F0F7; color:#CCC; }
+.heat-1 { background:#E8D5F0; color:var(--purple-dark); }
+.heat-2 { background:#D4A8E3; color:#5A2A70; }
+.heat-3 { background:#BF7ED4; color:#fff; }
+.heat-4 { background:var(--purple); color:#fff; }
+
+/* ── AUDIENCE BUBBLE ── */
+.audience-donut { display:flex; align-items:center; gap:24px; }
+.gender-legend { display:flex; flex-direction:column; gap:10px; }
+.legend-item { display:flex; align-items:center; gap:8px; font-size:.88em; }
+.legend-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+
+/* ── PROJECTION TABLE ── */
+.proj-table { width:100%; border-collapse:collapse; font-size:.88em; margin-top:20px; }
+.proj-table th { background:var(--purple); color:#fff; padding:12px 16px; text-align:left; }
+.proj-table th:first-child { border-radius:8px 0 0 0; }
+.proj-table th:last-child { border-radius:0 8px 0 0; }
+.proj-table td { padding:11px 16px; border-bottom:1px solid #F0E8F2; }
+.proj-table tr:last-child td { border-bottom:none; background:#F8F4FC; font-weight:600; }
+.proj-table .target-row td { background:linear-gradient(90deg,#EDE2F5,#F5F0F7); font-weight:700; color:var(--purple-dark); }
+
+/* ── FOOTER ── */
+footer { background:#fff; border-top:1px solid var(--border); padding:24px 28px; max-width:1440px; margin:0 auto;
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; font-size:.82em; color:var(--text-light); }
+footer strong { color:var(--purple); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+.fade-up { animation:fadeUp .5s ease both; }
+.fade-up:nth-child(2){animation-delay:.08s} .fade-up:nth-child(3){animation-delay:.16s}
+.fade-up:nth-child(4){animation-delay:.24s} .fade-up:nth-child(5){animation-delay:.32s}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <div class="nav-brand">HERA <span>Media Impact</span></div>
+  <div class="nav-tab active" onclick="showPage('executive')">Executive</div>
+  <div class="nav-tab" onclick="showPage('stories')">Stories <span class="nav-badge">22</span></div>
+  <div class="nav-tab" onclick="showPage('analytics')">Analytics</div>
+  <div class="nav-tab" onclick="showPage('audience')">Audience</div>
+  <div class="nav-tab" onclick="showPage('indicators')">Indicators</div>
+  <div class="nav-tab" onclick="showPage('projection')">Projections</div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 1: EXECUTIVE IMPACT VIEW
+═══════════════════════════════════════════════ -->
+<div class="page active" id="page-executive">
+
+  <div class="hero fade-up">
+    <h1>Building a Community of Human Rights Defenders</h1>
+    <p>Media Impact Dashboard · Promoting Gender Equality in North Macedonia · HERA × Coalition Margins</p>
+    <div class="hero-meta">
+      <div class="hero-chip">📅 Data as of December 2025</div>
+      <div class="hero-chip">🇲🇰 North Macedonia</div>
+      <div class="hero-chip">📡 5 Media Outlets</div>
+      <div class="hero-chip">🎯 Target: 400,000 by June 2027</div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card primary fade-up">
+      <div class="kpi-icon">📢</div>
+      <div class="kpi-value">290.2K</div>
+      <div class="kpi-label">Total Reach to Date</div>
+      <div class="kpi-sub">72.5% of 400K target · Dec 2025</div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:72.5%;background:linear-gradient(90deg,var(--purple-light),var(--purple));"></div></div>
+    </div>
+    <div class="kpi-card coral fade-up">
+      <div class="kpi-icon">📺</div>
+      <div class="kpi-value">218.6K</div>
+      <div class="kpi-label">TV Broadcast Reach</div>
+      <div class="kpi-sub">75.3% of total · 5 national outlets</div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:75.3%;background:linear-gradient(90deg,var(--coral),var(--coral-dark));"></div></div>
+    </div>
+    <div class="kpi-card blue fade-up">
+      <div class="kpi-icon">📱</div>
+      <div class="kpi-value">71.6K</div>
+      <div class="kpi-label">Social Media Reach</div>
+      <div class="kpi-sub">Facebook 54K · YouTube 17.5K</div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:24.7%;background:linear-gradient(90deg,var(--blue),var(--deep-blue));"></div></div>
+    </div>
+    <div class="kpi-card gold fade-up">
+      <div class="kpi-icon">✍️</div>
+      <div class="kpi-value">22</div>
+      <div class="kpi-label">Stories Published</div>
+      <div class="kpi-sub">Target: 25 · 88% completion</div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:88%;background:linear-gradient(90deg,var(--gold),#B8912A);"></div></div>
+    </div>
+    <div class="kpi-card fade-up">
+      <div class="kpi-icon">👩</div>
+      <div class="kpi-value">68.8%</div>
+      <div class="kpi-label">Female Audience Share</div>
+      <div class="kpi-sub">FB weighted avg · 29.9% Men · 1.3% Unknown</div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:68.8%;background:linear-gradient(90deg,var(--purple-light),var(--coral));"></div></div>
+    </div>
+    <div class="kpi-card fade-up">
+      <div class="kpi-icon">📰</div>
+      <div class="kpi-value">109.8K</div>
+      <div class="kpi-label">Remaining to Target</div>
+      <div class="kpi-sub">~9,150/month needed by June 2027</div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:27.5%;background:linear-gradient(90deg,#FFB74D,var(--coral));"></div></div>
+    </div>
+  </div>
+
+  <!-- Gauge + Trajectory + Indicator Snapshot -->
+  <div class="grid-2 fade-up">
+    <div class="chart-card">
+      <h3>🎯 Overall Reach Target Progress (INT.Op 4.1)</h3>
+      <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;padding:10px 0;">
+        <div class="gauge-wrap">
+          <svg class="gauge-svg" viewBox="0 0 200 110">
+            <defs>
+              <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#C9A8D4"/>
+                <stop offset="100%" stop-color="#A079AE"/>
+              </linearGradient>
+            </defs>
+            <!-- Track -->
+            <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#EEE" stroke-width="18" stroke-linecap="round"/>
+            <!-- Fill 72.5% = 130.5deg of 180deg -->
+            <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGrad)" stroke-width="18"
+              stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="69" />
+            <!-- Milestones -->
+            <circle cx="100" cy="20" r="4" fill="#DDD"/>
+            <text x="100" y="15" text-anchor="middle" font-size="9" fill="#AAA">200K</text>
+            <!-- Value -->
+            <text x="100" y="88" text-anchor="middle" font-family="Playfair Display" font-size="26" font-weight="700" fill="#A079AE">290K</text>
+            <text x="100" y="104" text-anchor="middle" font-size="10" fill="#999">of 400K target</text>
+          </svg>
+          <div style="display:flex;gap:20px;font-size:.82em;margin-top:8px;">
+            <span style="color:#999">0</span>
+            <span style="color:#FF9800;font-weight:600">50% ⬥</span>
+            <span style="color:var(--purple);font-weight:700">72.5% ✓</span>
+            <span style="color:#4CAF50">100%</span>
+          </div>
+        </div>
+        <div style="flex:1;min-width:180px;">
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;font-size:.84em;margin-bottom:5px;">
+              <span>Progress to 400K</span><strong style="color:var(--purple)">72.5%</strong>
+            </div>
+            <div class="mini-bar" style="height:10px;"><div class="mini-bar-fill" style="width:72.5%;height:10px;background:linear-gradient(90deg,var(--purple-light),var(--purple));"></div></div>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;font-size:.84em;margin-bottom:5px;">
+              <span>TV Reach / TV Target (300K)</span><strong style="color:var(--coral-dark)">72.9%</strong>
+            </div>
+            <div class="mini-bar" style="height:10px;"><div class="mini-bar-fill" style="width:72.9%;height:10px;background:linear-gradient(90deg,var(--coral),var(--coral-dark));"></div></div>
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;font-size:.84em;margin-bottom:5px;">
+              <span>Digital Reach / Digital Target (100K)</span><strong style="color:var(--deep-blue)">71.6%</strong>
+            </div>
+            <div class="mini-bar" style="height:10px;"><div class="mini-bar-fill" style="width:71.6%;height:10px;background:linear-gradient(90deg,var(--blue),var(--deep-blue));"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:.84em;margin-bottom:5px;">
+              <span>Stories Published / Target (25)</span><strong style="color:#B8912A">88%</strong>
+            </div>
+            <div class="mini-bar" style="height:10px;"><div class="mini-bar-fill" style="width:88%;height:10px;background:linear-gradient(90deg,var(--gold),#B8912A);"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3>📈 Cumulative Reach Trajectory (2025–2027)</h3>
+      <div class="chart-wrap"><canvas id="trajectoryChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Platform + Indicator Snapshot -->
+  <div class="grid-2 fade-up">
+    <div class="chart-card">
+      <h3>📡 Platform Distribution</h3>
+      <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+        <div style="width:180px;height:180px;position:relative;flex-shrink:0;">
+          <canvas id="platformChart"></canvas>
+        </div>
+        <div style="flex:1;min-width:160px;">
+          <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:2px;background:var(--purple);flex-shrink:0;"></div>
+            <div style="flex:1"><div style="font-size:.84em;font-weight:600;">Sitel TV</div>
+              <div class="mini-bar" style="margin-top:3px;"><div class="mini-bar-fill" style="width:45.1%;background:var(--purple);"></div></div>
+            </div><strong style="font-size:.88em;">130.8K</strong>
+          </div>
+          <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:2px;background:var(--coral);flex-shrink:0;"></div>
+            <div style="flex:1"><div style="font-size:.84em;font-weight:600;">Alsat</div>
+              <div class="mini-bar" style="margin-top:3px;"><div class="mini-bar-fill" style="width:12.2%;background:var(--coral);"></div></div>
+            </div><strong style="font-size:.88em;">35.4K</strong>
+          </div>
+          <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:2px;background:var(--blue);flex-shrink:0;"></div>
+            <div style="flex:1"><div style="font-size:.84em;font-weight:600;">Facebook</div>
+              <div class="mini-bar" style="margin-top:3px;"><div class="mini-bar-fill" style="width:18.6%;background:var(--blue);"></div></div>
+            </div><strong style="font-size:.88em;">54.1K</strong>
+          </div>
+          <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:2px;background:var(--gold);flex-shrink:0;"></div>
+            <div style="flex:1"><div style="font-size:.84em;font-weight:600;">Telma</div>
+              <div class="mini-bar" style="margin-top:3px;"><div class="mini-bar-fill" style="width:9.9%;background:var(--gold);"></div></div>
+            </div><strong style="font-size:.88em;">28.7K</strong>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:2px;background:var(--deep-blue);flex-shrink:0;"></div>
+            <div style="flex:1"><div style="font-size:.84em;font-weight:600;">YouTube</div>
+              <div class="mini-bar" style="margin-top:3px;"><div class="mini-bar-fill" style="width:6%;background:var(--deep-blue);"></div></div>
+            </div><strong style="font-size:.88em;">17.5K</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3>🚦 Indicator Snapshot (RAG Status)</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#F8F4FC;border-radius:8px;">
+          <div class="rag rag-g"></div>
+          <div style="flex:1"><strong style="font-size:.88em;">INT.Op 4.1</strong> – Social Media Reach
+            <div style="font-size:.78em;color:var(--text-light)">Current: 71.6K · Target: 100K by Jun 2027</div></div>
+          <span class="badge badge-green">71.6% ↑</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#F8F4FC;border-radius:8px;">
+          <div class="rag rag-g"></div>
+          <div style="flex:1"><strong style="font-size:.88em;">INT.Op 4.2</strong> – TV/Broadcast Reach
+            <div style="font-size:.78em;color:var(--text-light)">Current: 218.6K · Target: 300K by Jun 2027</div></div>
+          <span class="badge badge-green">72.9% ↑</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#FFF8F0;border-radius:8px;">
+          <div class="rag rag-a"></div>
+          <div style="flex:1"><strong style="font-size:.88em;">INT.Op 4.3</strong> – Combined Reach Target
+            <div style="font-size:.78em;color:var(--text-light)">Current: 290.2K · Target: 400K by Jun 2027</div></div>
+          <span class="badge badge-gold">72.5% ⬥</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#F8F4FC;border-radius:8px;">
+          <div class="rag rag-g"></div>
+          <div style="flex:1"><strong style="font-size:.88em;">Output 1.1</strong> – Journalists Trained
+            <div style="font-size:.78em;color:var(--text-light)">20 journalists trained on gender-sensitive reporting</div></div>
+          <span class="badge badge-purple">On Track</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#FFF8F8;border-radius:8px;">
+          <div class="rag rag-a"></div>
+          <div style="flex:1"><strong style="font-size:.88em;">Output 1.2</strong> – Story Volume
+            <div style="font-size:.78em;color:var(--text-light)">22 of 25 target stories published</div></div>
+          <span class="badge badge-gold">88% ⬥</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#FFF8F8;border-radius:8px;">
+          <div class="rag rag-a"></div>
+          <div style="flex:1"><strong style="font-size:.88em;">Outcome 1</strong> – Media Partnerships Active
+            <div style="font-size:.78em;color:var(--text-light)">5 outlets cooperating · Target: 5+ long-term</div></div>
+          <span class="badge badge-blue">Active</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top 5 + Insights -->
+  <div class="grid-2 fade-up">
+    <div>
+      <div class="section-head"><h2>🏆 Top 5 Stories by Reach</h2></div>
+      <div id="topStoriesExecutive"></div>
+    </div>
+    <div class="chart-card">
+      <h3>🏷️ Reach by Topic Theme</h3>
+      <div class="chart-wrap"><canvas id="topicReachChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Strategic Insights -->
+  <div class="section-head fade-up"><h2>💡 Key Strategic Insights</h2></div>
+  <div class="insight-grid fade-up">
+    <div class="insight-card success">
+      <h4>✅ Strong Female Engagement</h4>
+      <p>68.8% weighted female audience share on Facebook — significantly above sector benchmarks. GBV and femicide content achieves 79–84% female engagement. This validates content strategy alignment with target groups.</p>
+    </div>
+    <div class="insight-card alert">
+      <h4>⚠️ Digital Growth Needed</h4>
+      <p>Social media delivers only 24.7% of total reach. To close the 109.8K gap by June 2027, digital channels must grow by ~154%. <strong>Monthly requirement: 9,150 additional reach/month.</strong></p>
+    </div>
+    <div class="insight-card warning">
+      <h4>📺 Single-Outlet Risk</h4>
+      <p>Sitel TV accounts for 45.1% of total reach (130.8K). Over-reliance on one partner creates vulnerability. Alsat (12.2%) and Telma (9.9%) need active strengthening through formal agreements.</p>
+    </div>
+    <div class="insight-card">
+      <h4>🔍 Investigative Content Multiplier</h4>
+      <p>Investigative pieces average 12K reach per story vs. 2–7K for standard news. The "Next Wave" anti-gender series achieved 13.8K. <strong>Recommendation:</strong> Double investigative output to 4–6 pieces annually.</p>
+    </div>
+    <div class="insight-card alert">
+      <h4>🌍 LGBTIQ+ Coverage Gap</h4>
+      <p>Only 1 story directly addressing LGBTIQ+ rights. The HIV discrimination piece (3.6K reach) demonstrates audience receptivity. A dedicated LGBTIQ+ content series targeting Radar.mk and YouTube is needed.</p>
+    </div>
+    <div class="insight-card">
+      <h4>📊 Male Audience Strategy Required</h4>
+      <p>Anti-gender movement investigations reach 39% male audience — the highest cross-gender engagement. Toxic masculinity and equal parenting content can serve as entry points for male audience expansion.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 2: STORY REGISTRY
+═══════════════════════════════════════════════ -->
+<div class="page" id="page-stories">
+  <div class="hero fade-up" style="background:linear-gradient(135deg,var(--deep-blue),#3D5A72);">
+    <h1>Story Performance Registry</h1>
+    <p>Complete registry of 22 journalistic content pieces · January–December 2025 · Sortable & Filterable</p>
+    <div class="hero-meta">
+      <div class="hero-chip">22 Stories Total</div>
+      <div class="hero-chip">71,551 Social Reach</div>
+      <div class="hero-chip">5 Media Outlets</div>
+    </div>
+  </div>
+
+  <div class="grid-3 fade-up">
+    <div class="top-story-card"><div class="top-rank rank-1">1</div>
+      <div class="top-story-info">
+        <h4><a href="https://www.youtube.com/watch?v=HtTLZb7KEjE" target="_blank" class="story-link">KOD 2025 – The brave journalist Daphne and the cutting of American support for North Macedonia</a></h4>
+        <small>MTV · Investigative · 67% Women</small>
+      </div>
+      <div class="top-story-reach"><strong>17,516</strong><small>Total Reach</small></div>
+    </div>
+    <div class="top-story-card"><div class="top-rank rank-2">2</div>
+      <div class="top-story-info">
+        <h4><a href="https://www.youtube.com/watch?v=2Kl0ESqKlcQ" target="_blank" class="story-link">"The Next Wave" and North Macedonia: A Report on the funding and politics of anti-gender movements</a></h4>
+        <small>MTV · Investigative · 51% Women</small>
+      </div>
+      <div class="top-story-reach"><strong>14,118</strong><small>Total Reach</small></div>
+    </div>
+    <div class="top-story-card"><div class="top-rank rank-3">3</div>
+      <div class="top-story-info">
+        <h4><a href="https://www.youtube.com/watch?v=nryVONWNmwE" target="_blank" class="story-link">Ramayan's partner killed her in front of a 5-year-old daughter</a></h4>
+        <small>Sitel TV · GBV/Femicide · 81% Women</small>
+      </div>
+      <div class="top-story-reach"><strong>13,819</strong><small>Total Reach</small></div>
+    </div>
+  </div>
+
+  <div class="table-wrap fade-up">
+    <div class="table-toolbar">
+      <input class="search-box" type="text" id="storySearch" placeholder="🔍  Search by title, outlet, or theme..." oninput="filterStories()">
+      <select class="filter-select" id="outletFilter" onchange="filterStories()">
+        <option value="">All Outlets</option>
+        <option>MTV</option>
+        <option>Sitel TV</option>
+        <option>Alsat</option>
+        <option>Telma</option>
+        <option>TV24</option>
+        <option>TV24 / Radar</option>
+      </select>
+      <select class="filter-select" id="themeFilter" onchange="filterStories()">
+        <option value="">All Themes</option>
+        <option>GBV/Femicide</option>
+        <option>Investigative</option>
+        <option>Workplace</option>
+        <option>Health</option>
+        <option>Women in Leadership</option>
+        <option>LGBTIQ+</option>
+        <option>Youth</option>
+        <option>Agriculture</option>
+      </select>
+      <select class="filter-select" id="platformFilter" onchange="filterStories()">
+        <option value="">All Platforms</option>
+        <option>Facebook</option>
+        <option>YouTube</option>
+        <option>Both</option>
+      </select>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Story Title</th>
+          <th>Outlet</th>
+          <th>Theme</th>
+          <th>FB Reach</th>
+          <th>YT Reach</th>
+          <th>Total</th>
+          <th>Gender Split (FB)</th>
+          <th>Link</th>
+        </tr>
+      </thead>
+      <tbody id="storiesTableBody"></tbody>
+    </table>
+    <div style="margin-top:14px;font-size:.82em;color:var(--text-light);display:flex;justify-content:space-between;">
+      <span id="storyCount">Showing 22 of 22 stories</span>
+      <span>Total social reach: <strong>71,551</strong></span>
+    </div>
+  </div>
+
+  <!-- Top by Women's audience -->
+  <div class="grid-2 fade-up" style="margin-top:24px;">
+    <div class="chart-card">
+      <h3>👩 Top Stories by Women's Audience Share</h3>
+      <div class="chart-wrap"><canvas id="femaleTopChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>👨 Top Stories by Reach Among Men</h3>
+      <div class="chart-wrap"><canvas id="maleTopChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 3: THEMATIC & OUTLET ANALYTICS
+═══════════════════════════════════════════════ -->
+<div class="page" id="page-analytics">
+  <div class="hero fade-up" style="background:linear-gradient(135deg,var(--coral-dark),#B05060);">
+    <h1>Thematic & Outlet Analytics</h1>
+    <p>What content performs, where, and for whom · Theme × Outlet cross-analysis</p>
+    <div class="hero-meta">
+      <div class="hero-chip">7 Content Themes</div>
+      <div class="hero-chip">6 Media Outlets</div>
+      <div class="hero-chip">Reach × Engagement Matrix</div>
+    </div>
+  </div>
+
+  <div class="grid-2 fade-up">
+    <div class="chart-card">
+      <h3>📊 Total Reach by Theme</h3>
+      <div class="chart-wrap"><canvas id="themeReachChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>📰 Stories Count by Theme</h3>
+      <div class="chart-wrap"><canvas id="themeCountChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-2 fade-up">
+    <div class="chart-card">
+      <h3>📺 Reach by Outlet</h3>
+      <div class="chart-wrap"><canvas id="outletReachChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>🔵 Facebook vs YouTube by Story (Social Reach)</h3>
+      <div class="chart-wrap"><canvas id="fbVsYtChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Heatmap -->
+  <div class="chart-card fade-up">
+    <h3>🌡️ Heatmap: Theme × Outlet (Total Social Reach)</h3>
+    <p style="font-size:.83em;color:var(--text-light);margin-bottom:16px;">Colour intensity reflects reach volume. Darker = higher reach.</p>
+    <div style="overflow-x:auto;">
+      <table class="heatmap-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Theme</th>
+            <th>MTV</th><th>Sitel TV</th><th>Alsat</th><th>Telma</th><th>TV24</th><th>TV24/Radar</th>
+          </tr>
+        </thead>
+        <tbody id="heatmapBody"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:14px;font-size:.78em;color:var(--text-light);">
+      <span>Low</span>
+      <div style="width:100px;height:10px;border-radius:5px;background:linear-gradient(90deg,#F5F0F7,var(--purple));"></div>
+      <span>High</span>
+    </div>
+  </div>
+
+  <!-- Efficiency chart -->
+  <div class="chart-card fade-up">
+    <h3>⚡ Reach Efficiency: Reach per Story by Theme</h3>
+    <div class="chart-wrap sm"><canvas id="efficiencyChart"></canvas></div>
+    <p style="margin-top:12px;font-size:.84em;color:var(--text-light);">Investigative content delivers 12K avg reach per story — 5× the GBV/Femicide category average. Prioritise investigative commissions for maximum impact per resource invested.</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 4: AUDIENCE PROFILE
+═══════════════════════════════════════════════ -->
+<div class="page" id="page-audience">
+  <div class="hero fade-up" style="background:linear-gradient(135deg,var(--purple-dark),#5A3A6A);">
+    <h1>Audience Profile Insights</h1>
+    <p>Gender-segregated Facebook audience analytics · Who is being reached and where gaps remain</p>
+    <div class="hero-meta">
+      <div class="hero-chip">68.8% Women</div>
+      <div class="hero-chip">29.9% Men</div>
+      <div class="hero-chip">1.3% Unknown</div>
+    </div>
+  </div>
+
+  <div class="grid-2 fade-up">
+    <div class="chart-card">
+      <h3>🍩 Overall FB Gender Distribution (Weighted by Views)</h3>
+      <div style="display:flex;align-items:center;gap:24px;padding:10px 0;">
+        <div style="width:200px;height:200px;position:relative;flex-shrink:0;">
+          <canvas id="genderDonut"></canvas>
+        </div>
+        <div class="gender-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--purple);"></div>
+            <div><strong>Women</strong><br><span style="font-size:.82em;color:var(--text-light)">68.8% · ~49,000 people</span></div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--blue);"></div>
+            <div><strong>Men</strong><br><span style="font-size:.82em;color:var(--text-light)">29.9% · ~21,300 people</span></div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--cream);border:1px solid #DDD;"></div>
+            <div><strong>Unknown</strong><br><span style="font-size:.82em;color:var(--text-light)">1.3% · ~930 people</span></div>
+          </div>
+          <div style="margin-top:16px;padding:12px;background:#F8F4FC;border-radius:8px;">
+            <div style="font-size:.82em;color:var(--text-light);">Sector benchmark (NGO avg)</div>
+            <div style="font-size:.88em;font-weight:600;margin-top:4px;">Women: 58% · Men: 39% · Unknown: 3%</div>
+            <div style="font-size:.78em;color:var(--purple);margin-top:4px;">↑ 10.8pp above benchmark — exceptional alignment</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3>📡 Gender Engagement Radar by Theme</h3>
+      <div class="chart-wrap"><canvas id="genderRadarChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="chart-card fade-up">
+    <h3>🔵 Scatter: Total Reach vs Women's Audience Share (by Story)</h3>
+    <p style="font-size:.83em;color:var(--text-light);margin-bottom:16px;">Bubble size = total reach. High reach + high women's share = optimal content for the project's gender equality goals.</p>
+    <div class="chart-wrap tall"><canvas id="scatterChart"></canvas></div>
+  </div>
+
+  <div class="grid-2 fade-up">
+    <div class="chart-card">
+      <h3>👩 Highest Women's Engagement by Story</h3>
+      <div class="chart-wrap"><canvas id="womenEngChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>📋 Audience Gaps & Strategic Flags</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+        <div style="padding:12px;background:#FFF8F8;border-left:3px solid var(--coral);border-radius:6px;">
+          <strong style="font-size:.88em;color:var(--coral-dark);">🚩 Low male reach in GBV content</strong>
+          <p style="font-size:.82em;color:var(--text-light);margin-top:4px;">GBV/femicide stories average 20% male engagement. Reframing narratives around male bystander responsibility could improve male engagement without alienating women.</p>
+        </div>
+        <div style="padding:12px;background:#F8F4FC;border-left:3px solid var(--purple);border-radius:6px;">
+          <strong style="font-size:.88em;color:var(--purple-dark);">✅ Anti-gender investigations reach men (39%)</strong>
+          <p style="font-size:.82em;color:var(--text-light);margin-top:4px;">Highest cross-gender reach. Documentary format drives male curiosity. Scale this for broader male audience engagement strategy.</p>
+        </div>
+        <div style="padding:12px;background:#FFF8F0;border-left:3px solid var(--gold);border-radius:6px;">
+          <strong style="font-size:.88em;color:#8A6620;">⬥ Unknown audience 1.3% — data quality flag</strong>
+          <p style="font-size:.82em;color:var(--text-light);margin-top:4px;">4 stories show zero or minimal tracking. Activate Facebook Pixel on all content URLs and ensure outlet-level analytics sharing agreements.</p>
+        </div>
+        <div style="padding:12px;background:#F0F8F4;border-left:3px solid #4CAF50;border-radius:6px;">
+          <strong style="font-size:.88em;color:#2A7A52;">✅ Strong alignment with project beneficiaries</strong>
+          <p style="font-size:.82em;color:var(--text-light);margin-top:4px;">68.8% female reach means primary beneficiaries are engaging. Retain this focus while expanding strategies to include secondary audiences (male allies, policymakers).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 5: INDICATOR & LOGFRAME LINKAGE
+═══════════════════════════════════════════════ -->
+<div class="page" id="page-indicators">
+  <div class="hero fade-up" style="background:linear-gradient(135deg,#6890AC,#4A6A8A);">
+    <h1>Results Framework & Indicator Tracking</h1>
+    <p>Logframe linkage · Baseline → Target → Current · RAG status for all media-related indicators</p>
+    <div class="hero-meta">
+      <div class="hero-chip">3 Intermediate Outcomes</div>
+      <div class="hero-chip">2 Output Indicators</div>
+      <div class="hero-chip">Outcome 1 Tracked</div>
+    </div>
+  </div>
+
+  <div class="section-head fade-up"><h2>🎯 Intermediate Outcome 4 — Media & Social Media Impact</h2></div>
+  <div class="indicator-grid fade-up">
+    <div class="indicator-card on-track">
+      <div class="ind-code">INT.Op 4.1</div>
+      <div class="ind-title">Social media reach for gender equality content</div>
+      <div class="ind-progress"><div class="ind-fill purple" style="width:71.6%"></div></div>
+      <div class="ind-stats">
+        <div class="ind-stat"><span>Baseline</span><span>0</span></div>
+        <div class="ind-stat"><span>Current</span><span>71,551</span></div>
+        <div class="ind-stat"><span>Target</span><span>100,000</span></div>
+        <div class="ind-stat"><span>Progress</span><span style="color:var(--purple);">71.6%</span></div>
+        <div class="ind-stat"><span>RAG</span><span><span class="rag rag-g"></span>On Track</span></div>
+      </div>
+    </div>
+    <div class="indicator-card amber">
+      <div class="ind-code">INT.Op 4.2</div>
+      <div class="ind-title">TV / Broadcast audience reach for gender equality content</div>
+      <div class="ind-progress"><div class="ind-fill orange" style="width:72.9%"></div></div>
+      <div class="ind-stats">
+        <div class="ind-stat"><span>Baseline</span><span>0</span></div>
+        <div class="ind-stat"><span>Current</span><span>218,649</span></div>
+        <div class="ind-stat"><span>Target</span><span>300,000</span></div>
+        <div class="ind-stat"><span>Progress</span><span style="color:#FF9800;">72.9%</span></div>
+        <div class="ind-stat"><span>RAG</span><span><span class="rag rag-a"></span>Amber</span></div>
+      </div>
+    </div>
+    <div class="indicator-card amber">
+      <div class="ind-code">INT.Op 4.3</div>
+      <div class="ind-title">Combined total reach — all media channels</div>
+      <div class="ind-progress"><div class="ind-fill orange" style="width:72.5%"></div></div>
+      <div class="ind-stats">
+        <div class="ind-stat"><span>Baseline</span><span>0</span></div>
+        <div class="ind-stat"><span>Current</span><span>290,200</span></div>
+        <div class="ind-stat"><span>Target</span><span>400,000</span></div>
+        <div class="ind-stat"><span>Progress</span><span style="color:#FF9800;">72.5%</span></div>
+        <div class="ind-stat"><span>RAG</span><span><span class="rag rag-a"></span>Amber</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head fade-up" style="margin-top:8px;"><h2>📋 Output Indicators — Content & Partnerships</h2></div>
+  <div class="indicator-grid fade-up">
+    <div class="indicator-card on-track">
+      <div class="ind-code">Output 1.1</div>
+      <div class="ind-title">Journalists trained on gender-sensitive reporting practices</div>
+      <div class="ind-progress"><div class="ind-fill green" style="width:100%"></div></div>
+      <div class="ind-stats">
+        <div class="ind-stat"><span>Baseline</span><span>0</span></div>
+        <div class="ind-stat"><span>Current</span><span>20</span></div>
+        <div class="ind-stat"><span>Target</span><span>20</span></div>
+        <div class="ind-stat"><span>Progress</span><span style="color:#4CAF50;">100% ✓</span></div>
+        <div class="ind-stat"><span>RAG</span><span><span class="rag rag-g"></span>Achieved</span></div>
+      </div>
+    </div>
+    <div class="indicator-card amber">
+      <div class="ind-code">Output 1.2</div>
+      <div class="ind-title">Journalistic stories/content pieces published</div>
+      <div class="ind-progress"><div class="ind-fill purple" style="width:88%"></div></div>
+      <div class="ind-stats">
+        <div class="ind-stat"><span>Baseline</span><span>0</span></div>
+        <div class="ind-stat"><span>Current</span><span>22</span></div>
+        <div class="ind-stat"><span>Target</span><span>25</span></div>
+        <div class="ind-stat"><span>Progress</span><span style="color:var(--purple);">88%</span></div>
+        <div class="ind-stat"><span>RAG</span><span><span class="rag rag-a"></span>Amber</span></div>
+      </div>
+    </div>
+    <div class="indicator-card on-track">
+      <div class="ind-code">Output 1.3</div>
+      <div class="ind-title">Active media outlet partnerships (PS Media)</div>
+      <div class="ind-progress"><div class="ind-fill green" style="width:100%"></div></div>
+      <div class="ind-stats">
+        <div class="ind-stat"><span>Baseline</span><span>0</span></div>
+        <div class="ind-stat"><span>Current</span><span>5</span></div>
+        <div class="ind-stat"><span>Target</span><span>5</span></div>
+        <div class="ind-stat"><span>Progress</span><span style="color:#4CAF50;">100% ✓</span></div>
+        <div class="ind-stat"><span>RAG</span><span><span class="rag rag-g"></span>Achieved</span></div>
+      </div>
+    </div>
+    <div class="indicator-card on-track">
+      <div class="ind-code">Output 1.4</div>
+      <div class="ind-title">Investigative stories on gender-based violence &amp; rights</div>
+      <div class="ind-progress"><div class="ind-fill purple" style="width:50%"></div></div>
+      <div class="ind-stats">
+        <div class="ind-stat"><span>Baseline</span><span>0</span></div>
+        <div class="ind-stat"><span>Current</span><span>2</span></div>
+        <div class="ind-stat"><span>Target</span><span>4</span></div>
+        <div class="ind-stat"><span>Progress</span><span style="color:var(--purple);">50%</span></div>
+        <div class="ind-stat"><span>RAG</span><span><span class="rag rag-a"></span>In Progress</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head fade-up" style="margin-top:8px;"><h2>🔗 Outcome 1 — Increased Public Knowledge of Gender Equality</h2></div>
+  <div class="indicator-grid fade-up">
+    <div class="indicator-card on-track">
+      <div class="ind-code">Outcome 1.1</div>
+      <div class="ind-title">Public media coverage of gender equality and GBV (number of pieces)</div>
+      <div class="ind-progress"><div class="ind-fill green" style="width:88%"></div></div>
+      <div class="ind-stats">
+        <div class="ind-stat"><span>Baseline</span><span>Low / Sporadic</span></div>
+        <div class="ind-stat"><span>Current</span><span>22 pieces</span></div>
+        <div class="ind-stat"><span>Target</span><span>25 pieces/yr</span></div>
+        <div class="ind-stat"><span>Progress</span><span style="color:#4CAF50;">88%</span></div>
+      </div>
+    </div>
+    <div class="indicator-card on-track">
+      <div class="ind-code">Outcome 1.2</div>
+      <div class="ind-title">Audience reached with gender equality messaging</div>
+      <div class="ind-progress"><div class="ind-fill purple" style="width:72.5%"></div></div>
+      <div class="ind-stats">
+        <div class="ind-stat"><span>Baseline</span><span>0</span></div>
+        <div class="ind-stat"><span>Current</span><span>290,200</span></div>
+        <div class="ind-stat"><span>Target</span><span>400,000</span></div>
+        <div class="ind-stat"><span>Progress</span><span style="color:var(--purple);">72.5%</span></div>
+      </div>
+    </div>
+    <div class="indicator-card amber">
+      <div class="ind-code">Outcome 1.3</div>
+      <div class="ind-title">Female beneficiaries reached as % of total audience</div>
+      <div class="ind-progress"><div class="ind-fill purple" style="width:80%"></div></div>
+      <div class="ind-stats">
+        <div class="ind-stat"><span>Baseline</span><span>~50%</span></div>
+        <div class="ind-stat"><span>Current</span><span>68.8%</span></div>
+        <div class="ind-stat"><span>Target</span><span>&gt;60%</span></div>
+        <div class="ind-stat"><span>Progress</span><span style="color:#4CAF50;">Exceeded ✓</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-card fade-up" style="margin-top:8px;">
+    <h3>📊 All Indicators: Current vs Target Comparison</h3>
+    <div class="chart-wrap"><canvas id="indicatorsChart"></canvas></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 6: IMPACT PROJECTIONS & SCENARIO TOOL
+═══════════════════════════════════════════════ -->
+<div class="page" id="page-projection">
+  <div class="hero fade-up" style="background:linear-gradient(135deg,#8A6220,#B8912A);">
+    <h1>Impact Projections & Scenario Planning</h1>
+    <p>Forecast reach to 400K target · Adjust assumptions · Model content strategies</p>
+    <div class="hero-meta">
+      <div class="hero-chip">Baseline: 290.2K</div>
+      <div class="hero-chip">Gap: 109.8K</div>
+      <div class="hero-chip">Deadline: June 2027</div>
+      <div class="hero-chip">18 months remaining</div>
+    </div>
+  </div>
+
+  <!-- Scenario Tool -->
+  <div class="scenario-card fade-up">
+    <div class="section-head"><h2>🎛️ Scenario Planner</h2><p>Adjust sliders to model different content strategies</p></div>
+    <div class="grid-2">
+      <div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Stories per quarter</span><span id="storiesVal">6</span></div>
+          <input type="range" min="2" max="12" value="6" id="storiesSlider" oninput="updateScenario()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Avg social reach per story</span><span id="avgReachVal">3,250</span></div>
+          <input type="range" min="500" max="15000" step="250" value="3250" id="avgReachSlider" oninput="updateScenario()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Investigative stories per quarter</span><span id="invVal">1</span></div>
+          <input type="range" min="0" max="4" value="1" id="invSlider" oninput="updateScenario()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>TV reach growth per quarter (%)</span><span id="tvGrowthVal">3%</span></div>
+          <input type="range" min="0" max="15" value="3" id="tvGrowthSlider" oninput="updateScenario()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Spike events (conferences/launches)</span><span id="eventsVal">1</span></div>
+          <input type="range" min="0" max="4" value="1" id="eventsSlider" oninput="updateScenario()">
+        </div>
+      </div>
+      <div class="scenario-result" id="scenarioResult">
+        <div class="scenario-stat">
+          <div class="label">Projected Total</div>
+          <div class="value" id="projTotal">—</div>
+          <div class="note">by June 2027</div>
+        </div>
+        <div class="scenario-stat">
+          <div class="label">Target Status</div>
+          <div class="value" id="projStatus">—</div>
+          <div class="note" id="projStatusNote">—</div>
+        </div>
+        <div class="scenario-stat">
+          <div class="label">Monthly Need</div>
+          <div class="value" id="projMonthly">—</div>
+          <div class="note">additional reach/month</div>
+        </div>
+        <div class="scenario-stat">
+          <div class="label">Social Media Adds</div>
+          <div class="value" id="projSocial">—</div>
+          <div class="note">over 18 months</div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-wrap tall" style="margin-top:24px;"><canvas id="scenarioChart"></canvas></div>
+  </div>
+
+  <!-- Projection milestones -->
+  <div class="grid-2 fade-up">
+    <div class="chart-card">
+      <h3>📅 Baseline Projection Timeline</h3>
+      <table class="proj-table">
+        <thead><tr><th>Period</th><th>Projected Reach</th><th>Growth</th><th>% to Target</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Dec 2025 (Baseline)</strong></td><td><span class="badge badge-purple">290,200</span></td><td>—</td><td>72.5%</td></tr>
+          <tr><td>Mar 2026</td><td>315,000</td><td>+24,800</td><td>78.8%</td></tr>
+          <tr><td>Jun 2026</td><td>340,000</td><td>+25,000</td><td>85.0%</td></tr>
+          <tr><td>Sep 2026</td><td>362,000</td><td>+22,000</td><td>90.5%</td></tr>
+          <tr><td>Dec 2026</td><td>380,000</td><td>+18,000</td><td>95.0%</td></tr>
+          <tr class="target-row"><td>Jun 2027 (Target)</td><td><strong>400,000+</strong></td><td>+20,000</td><td>100% ✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chart-card">
+      <h3>⚠️ Risk Register</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;padding:10px;background:#FFF8F8;border-radius:8px;align-items:flex-start;">
+          <span style="font-size:1.1em;flex-shrink:0;">🔴</span>
+          <div><strong style="font-size:.86em;color:var(--coral-dark);">Single-outlet dependency</strong>
+            <p style="font-size:.8em;color:var(--text-light);">Sitel TV = 45.1% of reach. Loss = ~130K gap. Diversify urgently.</p></div>
+        </div>
+        <div style="display:flex;gap:10px;padding:10px;background:#FFF8F0;border-radius:8px;align-items:flex-start;">
+          <span style="font-size:1.1em;flex-shrink:0;">🟡</span>
+          <div><strong style="font-size:.86em;color:#8A6220;">Digital stagnation</strong>
+            <p style="font-size:.8em;color:var(--text-light);">Social at 24.7%. Need 154% digital growth. Pilot FB advertising by Q2 2026.</p></div>
+        </div>
+        <div style="display:flex;gap:10px;padding:10px;background:#FFF8F0;border-radius:8px;align-items:flex-start;">
+          <span style="font-size:1.1em;flex-shrink:0;">🟡</span>
+          <div><strong style="font-size:.86em;color:#8A6220;">Anti-gender movement backlash</strong>
+            <p style="font-size:.8em;color:var(--text-light);">Editorial pressure on outlets. Formalise long-term agreements by Q1 2026.</p></div>
+        </div>
+        <div style="display:flex;gap:10px;padding:10px;background:#F0F8F4;border-radius:8px;align-items:flex-start;">
+          <span style="font-size:1.1em;flex-shrink:0;">🟢</span>
+          <div><strong style="font-size:.86em;color:#2A7A52;">Investigative content pipeline</strong>
+            <p style="font-size:.8em;color:var(--text-light);">2 more investigative pieces needed. Commission by March 2026 for Q3 publication.</p></div>
+        </div>
+        <div style="display:flex;gap:10px;padding:10px;background:#F0F8F4;border-radius:8px;align-items:flex-start;">
+          <span style="font-size:1.1em;flex-shrink:0;">🟢</span>
+          <div><strong style="font-size:.86em;color:#2A7A52;">Female audience base is solid</strong>
+            <p style="font-size:.8em;color:var(--text-light);">68.8% female reach ensures primary beneficiary engagement. Retain content focus.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div><strong>Data Source:</strong> Media Monitoring Registry · 22 journalistic content pieces (Jan–Dec 2025) · SM_HERA.html · HERA M&E System Annex 6</div>
+  <div>Dashboard maintained by Media & Communications Team · <strong>Last updated: February 2026</strong> · Next review: May 2026</div>
+</footer>
+
+<script>
+// ══════════════════════════════
+// DATA
+// ══════════════════════════════
+const PALETTE = {
+  purple:'#A079AE', coral:'#F09E9F', gold:'#E5C690', cream:'#EAD9CB',
+  blue:'#93B3C1', deepBlue:'#6890AC', purpleLight:'#C9A8D4',
+  coralDark:'#D4747A', purpleDark:'#7A558A'
+};
+
+const stories = [
+  {id:1,  title:'KOD 2025 – The brave journalist Daphne and the cutting of American support for North Macedonia', outlet:'MTV',          theme:'Investigative',       fb:10216, yt:7300, total:17516, women:67, men:31, unknown:2,  url:'https://www.youtube.com/watch?v=HtTLZb7KEjE'},
+  {id:2,  title:'"The Next Wave" and North Macedonia: A Report on the funding and politics of anti-gender movements',                   outlet:'MTV',          theme:'Investigative',       fb:13800, yt:318,  total:14118, women:51, men:48, unknown:1,  url:'https://www.youtube.com/watch?v=2Kl0ESqKlcQ'},
+  {id:3,  title:"Ramayan's partner killed her in front of a 5-year-old daughter",                                                       outlet:'Sitel TV',     theme:'GBV/Femicide',        fb:10119, yt:3700, total:13819, women:81, men:18, unknown:1,  url:'https://www.youtube.com/watch?v=nryVONWNmwE'},
+  {id:4,  title:'Family Law Changes Affecting Domestic Violence Legislation',                                                           outlet:'Sitel TV',     theme:'GBV/Femicide',        fb:3647,  yt:213,  total:3860,  women:84, men:14, unknown:1,  url:'https://sitel.com.mk/semejnoto-nasilstvo-kje-se-goni-po-sluzhbena-dolzhnost-so-novite-izmeni-vo-krivichniot-zakon'},
+  {id:5,  title:'Discrimination of People Living with HIV',                                                                             outlet:'MTV',          theme:'Health',              fb:3531,  yt:93,   total:3624,  women:68, men:31, unknown:1,  url:'https://www.youtube.com/watch?v=WFtM_zSp0Qk'},
+  {id:6,  title:'Timely Information for Youth – Key to Preventing Adolescent Pregnancy',                                               outlet:'TV24 / Radar', theme:'Youth',               fb:0,     yt:2712, total:2712,  women:0,  men:0,  unknown:0,  url:'https://radar.mk/?p=51171'},
+  {id:7,  title:'Family and Gender-based Violence Escalating with More Femicides',                                                     outlet:'TV24',         theme:'GBV/Femicide',        fb:1886,  yt:137,  total:2023,  women:75, men:24, unknown:1,  url:'https://www.youtube.com/watch?v=Q2cAEJEuFvM&t=438s'},
+  {id:8,  title:'Why are men more conservative while women are becoming more liberal?',                                                 outlet:'Alsat',        theme:'Investigative',       fb:1348,  yt:146,  total:1494,  women:73, men:26, unknown:1,  url:'https://www.youtube.com/watch?app=desktop&v=2Mj0DtjheEw&list=PL65Yb4b3qUG30oQTzwXRKxgILvtHpQPO7&index=2'},
+  {id:9,  title:'Pregnancy After Death of Partner',                                                                                    outlet:'Alsat',        theme:'GBV/Femicide',        fb:1215,  yt:165,  total:1380,  women:77, men:22, unknown:1,  url:'https://youtu.be/tI6G3nLAvT4?si=bK5nMW3qhM2YuDDL'},
+  {id:10, title:'The Only Certified Chimney Sweep in Macedonia is a Woman',                                                            outlet:'Sitel TV',     theme:'Workplace',           fb:1170,  yt:207,  total:1377,  women:78, men:21, unknown:1,  url:'https://www.youtube.com/watch?v=7cjkXBfF8JI'},
+  {id:11, title:'Difficulties in Reporting Gender-Based and Sexual Violence',                                                          outlet:'Alsat',        theme:'GBV/Femicide',        fb:776,   yt:578,  total:1354,  women:79, men:19, unknown:2,  url:'https://www.youtube.com/watch?v=Oc4FtWCocvQ&t=94s'},
+  {id:12, title:'Two Parents, Equal Care, Equality at Home',                                                                           outlet:'Telma',        theme:'Workplace',           fb:1255,  yt:63,   total:1318,  women:77, men:22, unknown:1,  url:'https://www.youtube.com/watch?v=dBEpNO0j3T4'},
+  {id:13, title:'Young Mothers (Early Marriages)',                                                                                     outlet:'Telma',        theme:'Youth',               fb:1122,  yt:44,   total:1166,  women:77, men:21, unknown:2,  url:'https://www.youtube.com/watch?v=8UUz8PluT5w'},
+  {id:14, title:'Women in Football – Courage, Bravery and Resilience',                                                                outlet:'MTV',          theme:'Women in Leadership', fb:922,   yt:214,  total:1136,  women:76, men:23, unknown:1,  url:'https://www.youtube.com/watch?v=HS4plTBLiPo'},
+  {id:15, title:'Interview on Job Placement: Perceptions about Personal Issues in Employment',                                         outlet:'MTV',          theme:'Workplace',           fb:822,   yt:45,   total:867,   women:72, men:27, unknown:1,  url:'https://www.youtube.com/watch?v=popsLf3w9aM'},
+  {id:16, title:'The Significance of Women in Security',                                                                               outlet:'MTV',          theme:'Women in Leadership', fb:840,   yt:7,    total:847,   women:72, men:27, unknown:1,  url:'https://play.mrt.com.mk/play/584549'},
+  {id:17, title:"Column on Women's Representation in Leadership Positions",                                                            outlet:'Telma',        theme:'Women in Leadership', fb:794,   yt:50,   total:844,   women:71, men:21, unknown:3,  url:'https://www.youtube.com/watch?v=W-PTkI-KSJg'},
+  {id:18, title:'Women "Shadows"',                                                                                                     outlet:'TV24 / Radar', theme:'GBV/Femicide',        fb:0,     yt:822,  total:822,   women:0,  men:0,  unknown:0,  url:'https://radar.mk/?p=51002'},
+  {id:19, title:'Toxic Masculinity in Young People',                                                                                   outlet:'Alsat',        theme:'Youth',               fb:600,   yt:153,  total:753,   women:75, men:23, unknown:2,  url:'https://www.youtube.com/watch?v=etWI031JUsw'},
+  {id:20, title:'TV24 Report: How can Female Farmers Find their Place in the System?',                                                 outlet:'TV24',         theme:'Agriculture',         fb:0,     yt:249,  total:249,   women:0,  men:0,  unknown:0,  url:'https://www.youtube.com/watch?v=VjcgjUlSwaY&t=512s'},
+  {id:21, title:'SITEL Analysis: Why do Women Earn Less than Men?',                                                                    outlet:'Sitel TV',     theme:'Workplace',           fb:0,     yt:155,  total:155,   women:0,  men:0,  unknown:0,  url:'https://www.youtube.com/watch?v=xIEnHJGetPY'},
+  {id:22, title:'Abortion in Macedonia: What the Law Allows vs What Society Expects?',                                                 outlet:'Telma',        theme:'Health',              fb:0,     yt:117,  total:117,   women:0,  men:0,  unknown:0,  url:'https://www.youtube.com/watch?v=75CdbywGMU0'},
+];
+
+const THEME_COLORS = {
+  'GBV/Femicide': PALETTE.coral, 'Investigative': PALETTE.purple,
+  'Workplace': PALETTE.blue, 'Health': PALETTE.gold,
+  'Women in Leadership': PALETTE.deepBlue, 'Youth': '#B6D7A8',
+  'Agriculture': '#8AB480', 'LGBTIQ+': '#E8A0C0'
+};
+
+// ══════════════════════════════
+// NAVIGATION
+// ══════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ══════════════════════════════
+// STORIES TABLE
+// ══════════════════════════════
+function renderStoriesTable(data) {
+  const tbody = document.getElementById('storiesTableBody');
+  tbody.innerHTML = '';
+  data.forEach(s => {
+    const themeColor = THEME_COLORS[s.theme] || PALETTE.cream;
+    tbody.innerHTML += `<tr onclick="window.open('${s.url}','_blank')">
+      <td style="color:var(--text-light);font-size:.85em;">${s.id}</td>
+      <td><span class="story-link">${s.title}</span></td>
+      <td><span class="badge badge-blue">${s.outlet}</span></td>
+      <td><span class="badge" style="background:${themeColor}22;color:${themeColor.replace('#','') > 'BBBBBB' ? '#555' : themeColor}">${s.theme}</span></td>
+      <td class="reach-num">${s.fb > 0 ? s.fb.toLocaleString() : '<span style="color:#CCC">—</span>'}</td>
+      <td class="reach-num">${s.yt > 0 ? s.yt.toLocaleString() : '<span style="color:#CCC">—</span>'}</td>
+      <td><strong class="reach-num">${s.total.toLocaleString()}</strong></td>
+      <td>
+        <div class="gender-bar" title="Women: ${s.women}% · Men: ${s.men}% · Unknown: ${s.unknown}%">
+          <div class="f" style="width:${s.women}%"></div>
+          <div class="m" style="width:${s.men}%"></div>
+          <div class="u" style="width:${s.unknown}%"></div>
+        </div>
+        <div style="font-size:.72em;color:var(--text-light);margin-top:2px;">${s.women}%W · ${s.men}%M</div>
+      </td>
+      <td><a href="${s.url}" target="_blank" onclick="event.stopPropagation()" class="story-link" style="font-size:.85em;">View ↗</a></td>
+    </tr>`;
+  });
+  document.getElementById('storyCount').textContent = `Showing ${data.length} of ${stories.length} stories`;
+}
+
+function filterStories() {
+  const q = document.getElementById('storySearch').value.toLowerCase();
+  const outlet = document.getElementById('outletFilter').value;
+  const theme = document.getElementById('themeFilter').value;
+  const platform = document.getElementById('platformFilter').value;
+  const filtered = stories.filter(s => {
+    const matchQ = !q || s.title.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q) || s.theme.toLowerCase().includes(q);
+    const matchO = !outlet || s.outlet === outlet;
+    const matchT = !theme || s.theme === theme;
+    const matchP = !platform || (platform === 'Facebook' && s.fb > 0) || (platform === 'YouTube' && s.yt > 0) || (platform === 'Both' && s.fb > 0 && s.yt > 0);
+    return matchQ && matchO && matchT && matchP;
+  });
+  renderStoriesTable(filtered);
+}
+
+// ══════════════════════════════
+// TOP STORIES EXECUTIVE
+// ══════════════════════════════
+function renderTopStories() {
+  const top = [...stories].sort((a,b) => b.total - a.total).slice(0,5);
+  const ranks = ['rank-1','rank-2','rank-3','rank-n','rank-n'];
+  const nums = ['1','2','3','4','5'];
+  const container = document.getElementById('topStoriesExecutive');
+  container.innerHTML = top.map((s,i) => `
+    <div class="top-story-card">
+      <div class="top-rank ${ranks[i]}">${nums[i]}</div>
+      <div class="top-story-info">
+        <h4><a href="${s.url}" target="_blank" class="story-link">${s.title}</a></h4>
+        <small>${s.outlet} · ${s.theme} · ${s.women}% female audience</small>
+      </div>
+      <div class="top-story-reach">
+        <strong>${s.total.toLocaleString()}</strong>
+        <small>total reach</small>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════
+// CHART.JS HELPERS
+// ══════════════════════════════
+const defaults = { font:{family:"'DM Sans',sans-serif"} };
+Chart.defaults.font.family = "'DM Sans',sans-serif";
+Chart.defaults.color = '#7A6B80';
+
+function mkChart(id, config) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  return new Chart(ctx.getContext('2d'), config);
+}
+
+// ── Trajectory ──
+mkChart('trajectoryChart', {
+  type:'line',
+  data:{
+    labels:['Q3 2025','Dec 2025','Mar 2026','Jun 2026','Sep 2026','Dec 2026','Mar 2027','Jun 2027'],
+    datasets:[
+      {label:'Actual',data:[null,290200,null,null,null,null,null,null],borderColor:PALETTE.purple,backgroundColor:'rgba(160,121,174,0.08)',borderWidth:3,pointRadius:[0,8,0,0,0,0,0,0],pointBackgroundColor:PALETTE.purple,fill:true,tension:.4},
+      {label:'Projected',data:[null,290200,315000,340000,362000,380000,391000,400000],borderColor:PALETTE.coral,borderWidth:2.5,borderDash:[6,4],pointRadius:5,pointBackgroundColor:PALETTE.coral,fill:false,tension:.4},
+      {label:'Target (400K)',data:[400000,400000,400000,400000,400000,400000,400000,400000],borderColor:'#81C784',borderWidth:1.5,borderDash:[10,6],pointRadius:0,fill:false}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true}}},
+    scales:{y:{beginAtZero:false,min:250000,ticks:{callback:v=>(v/1000)+'K'}},x:{ticks:{font:{size:10}}}}}
+});
+
+// ── Platform Donut ──
+mkChart('platformChart', {
+  type:'doughnut',
+  data:{labels:['Sitel TV','Alsat','Telma','TV24','Facebook','YouTube'],
+    datasets:[{data:[130800,35406,28659,23784,54063,17488],
+      backgroundColor:[PALETTE.purple,PALETTE.coral,PALETTE.gold,PALETTE.blue,PALETTE.deepBlue,PALETTE.purpleLight],
+      borderColor:'#fff',borderWidth:3,hoverOffset:8}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+});
+
+// ── Topic Reach ──
+const themeData = [
+  {theme:'GBV/Femicide',count:7,reach:52000},
+  {theme:'Investigative',count:3,reach:33229},
+  {theme:'Workplace',count:4,reach:3717},
+  {theme:'Youth',count:3,reach:4631},
+  {theme:'Women in Leadership',count:3,reach:2827},
+  {theme:'Health',count:2,reach:3741},
+  {theme:'Agriculture',count:1,reach:249},
+];
+mkChart('topicReachChart', {
+  type:'bar',
+  data:{labels:themeData.map(d=>d.theme),
+    datasets:[{data:themeData.map(d=>d.reach),
+      backgroundColor:themeData.map(d=>THEME_COLORS[d.theme]||PALETTE.cream),
+      borderRadius:6,borderSkipped:false}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>(v/1000)+'K'}}}}
+});
+
+// ── Theme Reach Chart ──
+mkChart('themeReachChart', {
+  type:'bar',
+  data:{labels:themeData.map(d=>d.theme),
+    datasets:[{label:'Social Reach',data:themeData.map(d=>d.reach),
+      backgroundColor:themeData.map(d=>THEME_COLORS[d.theme]||PALETTE.cream),
+      borderRadius:6,borderSkipped:false}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{y:{ticks:{callback:v=>(v/1000)+'K'}}}}
+});
+
+// ── Theme Count ──
+mkChart('themeCountChart', {
+  type:'bar',
+  data:{labels:themeData.map(d=>d.theme),
+    datasets:[{label:'Stories',data:themeData.map(d=>d.count),
+      backgroundColor:themeData.map(d=>THEME_COLORS[d.theme]||PALETTE.cream),
+      borderRadius:6}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+});
+
+// ── Outlet Reach ──
+mkChart('outletReachChart', {
+  type:'bar',
+  data:{labels:['Sitel TV','Alsat','Facebook','Telma','TV24','YouTube','MTV (YT)','TV24/Radar'],
+    datasets:[{data:[130800,35406,54063,28659,23784,17488,17634,3534],
+      backgroundColor:[PALETTE.purple,PALETTE.coral,PALETTE.blue,PALETTE.gold,PALETTE.deepBlue,PALETTE.purpleLight,PALETTE.coral,PALETTE.cream],
+      borderRadius:6}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>(v/1000)+'K'}}}}
+});
+
+// ── FB vs YT ──
+const storiesWithBoth = stories.filter(s => s.fb > 0 && s.yt > 0).slice(0,10);
+mkChart('fbVsYtChart', {
+  type:'bar',
+  data:{labels:storiesWithBoth.map(s=>s.title.substring(0,28)+'…'),
+    datasets:[
+      {label:'Facebook',data:storiesWithBoth.map(s=>s.fb),backgroundColor:PALETTE.purple,borderRadius:4},
+      {label:'YouTube',data:storiesWithBoth.map(s=>s.yt),backgroundColor:PALETTE.blue,borderRadius:4}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},
+    scales:{x:{stacked:false,ticks:{font:{size:9}}},y:{ticks:{callback:v=>v>=1000?(v/1000)+'K':v}}}}
+});
+
+// ── Efficiency ──
+mkChart('efficiencyChart', {
+  type:'bar',
+  data:{labels:themeData.map(d=>d.theme),
+    datasets:[{label:'Avg Reach per Story',data:themeData.map(d=>Math.round(d.reach/d.count)),
+      backgroundColor:themeData.map(d=>THEME_COLORS[d.theme]||PALETTE.cream),borderRadius:6}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{y:{ticks:{callback:v=>v>=1000?(v/1000)+'K':v}}}}
+});
+
+// ── Heatmap ──
+const outlets = ['MTV','Sitel TV','Alsat','Telma','TV24','TV24/Radar'];
+const heatData = {
+  'GBV/Femicide':  {MTV:0,  'Sitel TV':17679, Alsat:2734, Telma:0,    TV24:2023, 'TV24/Radar':822},
+  'Investigative': {MTV:31634, 'Sitel TV':0,  Alsat:1494, Telma:0,    TV24:0,    'TV24/Radar':0},
+  'Workplace':     {MTV:867, 'Sitel TV':1532, Alsat:0,    Telma:2581, TV24:0,    'TV24/Radar':0},
+  'Youth':         {MTV:0,  'Sitel TV':0,     Alsat:753,  Telma:1166, TV24:249,  'TV24/Radar':2712},
+  'Women in Leadership':{MTV:1983,'Sitel TV':0,Alsat:0,   Telma:844,  TV24:0,    'TV24/Radar':0},
+  'Health':        {MTV:3624,'Sitel TV':0,    Alsat:0,    Telma:117,  TV24:0,    'TV24/Radar':0},
+  'Agriculture':   {MTV:0,  'Sitel TV':0,     Alsat:0,    Telma:0,    TV24:249,  'TV24/Radar':0},
+};
+const maxHeat = 32000;
+function heatClass(val) {
+  if (!val) return 'heat-0';
+  if (val < 1000) return 'heat-1';
+  if (val < 5000) return 'heat-2';
+  if (val < 15000) return 'heat-3';
+  return 'heat-4';
+}
+const hbody = document.getElementById('heatmapBody');
+Object.entries(heatData).forEach(([theme,vals]) => {
+  const row = `<tr><td style="font-weight:600;padding:8px 10px;font-size:.84em;">${theme}</td>` +
+    outlets.map(o => {
+      const v = vals[o] || 0;
+      return `<td class="${heatClass(v)}" title="${o}: ${v.toLocaleString()}">${v > 0 ? (v >= 1000 ? (v/1000).toFixed(1)+'K' : v) : '—'}</td>`;
+    }).join('') + '</tr>';
+  hbody.innerHTML += row;
+});
+
+// ── Gender Donut ──
+mkChart('genderDonut', {
+  type:'doughnut',
+  data:{labels:['Women 68.8%','Men 29.9%','Unknown 1.3%'],
+    datasets:[{data:[68.8,29.9,1.3],
+      backgroundColor:[PALETTE.purple,PALETTE.blue,PALETTE.cream],
+      borderColor:'#fff',borderWidth:4,hoverOffset:8}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{padding:12,usePointStyle:true}}}}
+});
+
+// ── Radar ──
+mkChart('genderRadarChart', {
+  type:'radar',
+  data:{labels:['GBV/Femicide','Investigative','Workplace','Health','Women Leaders','Youth'],
+    datasets:[
+      {label:'Women %',data:[79,59,74,71,73,71],borderColor:PALETTE.purple,backgroundColor:'rgba(160,121,174,0.15)',borderWidth:2,pointBackgroundColor:PALETTE.purple},
+      {label:'Men %',data:[20,39,25,28,26,28],borderColor:PALETTE.blue,backgroundColor:'rgba(147,179,193,0.15)',borderWidth:2,pointBackgroundColor:PALETTE.blue}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{padding:14,usePointStyle:true}}},
+    scales:{r:{beginAtZero:true,max:100,ticks:{font:{size:9}}}}}
+});
+
+// ── Scatter ──
+mkChart('scatterChart', {
+  type:'bubble',
+  data:{datasets:[{
+    label:'Stories',
+    data:stories.map(s=>({x:s.total, y:s.women, r:Math.max(4,Math.sqrt(s.total)/5), label:s.title})),
+    backgroundColor:stories.map(s=>`rgba(160,121,174,${Math.min(0.9, 0.3+s.total/20000)})`),
+    borderColor:PALETTE.purple, borderWidth:1
+  }]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const d=ctx.raw; const s=stories[ctx.dataIndex]; return [s.title.substring(0,40), `Reach: ${s.total.toLocaleString()}`, `Women: ${s.women}%`];}}}},
+    scales:{x:{title:{display:true,text:'Total Reach'},ticks:{callback:v=>v>=1000?(v/1000)+'K':v}},
+      y:{title:{display:true,text:"Women's Share %"},min:50,max:90}}}
+});
+
+// ── Women Engagement ──
+const topFemale = [...stories].sort((a,b)=>b.women-a.women).slice(0,7);
+mkChart('womenEngChart', {
+  type:'bar',
+  data:{labels:topFemale.map(s=>s.title.substring(0,30)+'…'),
+    datasets:[{data:topFemale.map(s=>s.women),
+      backgroundColor:PALETTE.purple, borderRadius:5}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},scales:{x:{min:50,max:90,ticks:{callback:v=>v+'%'}}}}
+});
+
+// ── Female Top Chart (Stories page) ──
+mkChart('femaleTopChart', {
+  type:'bar',
+  data:{labels:topFemale.map(s=>s.title.substring(0,28)+'…'),
+    datasets:[{label:'Women %',data:topFemale.map(s=>s.women),backgroundColor:PALETTE.purple,borderRadius:5}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},scales:{x:{min:55,max:90,ticks:{callback:v=>v+'%'}}}}
+});
+
+// ── Male Top ──
+const topMale = [...stories].sort((a,b)=>b.men-a.men).slice(0,7);
+mkChart('maleTopChart', {
+  type:'bar',
+  data:{labels:topMale.map(s=>s.title.substring(0,28)+'…'),
+    datasets:[{label:'Men %',data:topMale.map(s=>s.men),backgroundColor:PALETTE.blue,borderRadius:5}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},scales:{x:{min:10,max:45,ticks:{callback:v=>v+'%'}}}}
+});
+
+// ── Indicators Chart ──
+const indData = [
+  {label:'Social Reach (71.6K of 100K)',cur:71551,target:100000},
+  {label:'TV Reach (218.6K of 300K)',cur:218649,target:300000},
+  {label:'Total Reach (290.2K of 400K)',cur:290200,target:400000},
+  {label:'Stories Published (22 of 25)',cur:22,target:25},
+  {label:'Journalists Trained (20 of 20)',cur:20,target:20},
+  {label:'Media Partnerships (5 of 5)',cur:5,target:5},
+];
+mkChart('indicatorsChart', {
+  type:'bar',
+  data:{labels:indData.map(d=>d.label),
+    datasets:[
+      {label:'Current',data:indData.map(d=>d.cur/d.target*100),backgroundColor:PALETTE.purple,borderRadius:4},
+      {label:'Target (100%)',data:[100,100,100,100,100,100],backgroundColor:'rgba(160,121,174,0.15)',borderRadius:4}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom'}},
+    scales:{y:{max:110,ticks:{callback:v=>v+'%'}},x:{ticks:{font:{size:10}}}}}
+});
+
+// ══════════════════════════════
+// SCENARIO PLANNER
+// ══════════════════════════════
+let scenarioChart;
+function updateScenario() {
+  const storiesQ = +document.getElementById('storiesSlider').value;
+  const avgReach = +document.getElementById('avgReachSlider').value;
+  const invQ = +document.getElementById('invSlider').value;
+  const tvGrowth = +document.getElementById('tvGrowthSlider').value / 100;
+  const events = +document.getElementById('eventsSlider').value;
+
+  document.getElementById('storiesVal').textContent = storiesQ;
+  document.getElementById('avgReachVal').textContent = avgReach.toLocaleString();
+  document.getElementById('invVal').textContent = invQ;
+  document.getElementById('tvGrowthVal').textContent = document.getElementById('tvGrowthSlider').value + '%';
+  document.getElementById('eventsVal').textContent = events;
+
+  const INV_MULTIPLIER = 3.5;
+  const EVENT_BOOST = 8000;
+  const quarters = ['Dec 2025','Mar 2026','Jun 2026','Sep 2026','Dec 2026','Mar 2027','Jun 2027'];
+  let cumReach = 290200;
+  let tvBase = 218649;
+  const projData = [290200];
+
+  for (let q = 1; q <= 6; q++) {
+    const regStories = Math.max(0, storiesQ - invQ);
+    const socialAdd = regStories * avgReach + invQ * avgReach * INV_MULTIPLIER;
+    const eventAdd = (q <= events) ? EVENT_BOOST : 0;
+    tvBase = tvBase * (1 + tvGrowth);
+    cumReach += socialAdd + eventAdd;
+    projData.push(Math.round(cumReach));
+  }
+
+  const total = projData[projData.length-1];
+  const socialAdds = total - 290200;
+  const gap = Math.max(0, 400000 - total);
+  const monthly = gap > 0 ? Math.ceil(gap / 18) : 0;
+  const meets = total >= 400000;
+
+  document.getElementById('projTotal').textContent = (total/1000).toFixed(1) + 'K';
+  document.getElementById('projStatus').textContent = meets ? '✅ MET' : '⚠️ GAP';
+  document.getElementById('projStatusNote').textContent = meets ? 'Target achieved!' : `${gap.toLocaleString()} short`;
+  document.getElementById('projMonthly').textContent = monthly > 0 ? monthly.toLocaleString() : '—';
+  document.getElementById('projSocial').textContent = Math.round(socialAdds).toLocaleString();
+
+  if (scenarioChart) scenarioChart.destroy();
+  scenarioChart = mkChart('scenarioChart', {
+    type:'line',
+    data:{labels:quarters,datasets:[
+      {label:'Scenario Projection',data:projData,borderColor:PALETTE.purple,backgroundColor:'rgba(160,121,174,0.1)',fill:true,borderWidth:2.5,pointRadius:5,tension:.4},
+      {label:'Baseline (no action)',data:[290200,297000,304000,311000,318000,325000,332000],borderColor:'#CCC',borderDash:[5,5],borderWidth:1.5,pointRadius:0},
+      {label:'Target 400K',data:[400000,400000,400000,400000,400000,400000,400000],borderColor:'#81C784',borderDash:[10,5],borderWidth:1.5,pointRadius:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{usePointStyle:true,padding:16}}},
+      scales:{y:{min:250000,ticks:{callback:v=>(v/1000)+'K'}},x:{ticks:{font:{size:11}}}}}
+  });
+}
+
+// ══════════════════════════════
+// INIT
+// ══════════════════════════════
+renderStoriesTable(stories);
+renderTopStories();
+updateScenario();
+</script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>If-Then Logic Pathways</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .impact-box {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .impact-box h2 {
+            margin: 0 0 15px 0;
+            font-size: 2em;
+        }
+
+        .impact-box p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .pathway-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .pathway-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pathway-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .pathway-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .wp1::before {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .wp2::before {
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+        }
+
+        .wp3::before {
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+        }
+
+        .wp4::before {
+            background: linear-gradient(90deg, #43e97b, #38f9d7);
+        }
+
+        .wp-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-top: 10px;
+        }
+
+        .logic-step {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 4px solid #4299e1;
+            position: relative;
+        }
+
+        .step-label {
+            font-weight: 600;
+            color: #2b6cb0;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-content {
+            color: #2d3748;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .if-step {
+            border-left-color: #667eea;
+        }
+
+        .if-step .step-label {
+            color: #667eea;
+        }
+
+        .then-step {
+            border-left-color: #f6ad55;
+        }
+
+        .then-step .step-label {
+            color: #dd6b20;
+        }
+
+        .therefore-step {
+            border-left-color: #48bb78;
+        }
+
+        .therefore-step .step-label {
+            color: #2f855a;
+        }
+
+        .impact-step {
+            border-left-color: #fc8181;
+            background: linear-gradient(135deg, #fff5f5, #fed7d7);
+        }
+
+        .impact-step .step-label {
+            color: #c53030;
+            font-size: 1em;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 1.5em;
+            color: #4299e1;
+            margin: 10px 0;
+        }
+
+        .icon {
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .pathway-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 If-Then Logic Pathways</h1>
+            <p>Theory of Change: From Activities to Impact</p>
+        </div>
+
+        <div class="impact-box">
+            <h2>🎯 ULTIMATE IMPACT</h2>
+            <p>To protect the well-being, human rights and fundamental freedoms, with focus on girls, women and vulnerable groups in North Macedonia</p>
+        </div>
+
+        <div class="pathway-grid">
+            <!-- WP1 Pathway -->
+            <div class="pathway-card wp1">
+                <div class="wp-title">📰 WP1: Transformative Role of Media</div>
+                
+                <div class="logic-step if-step">
+                    <div class="step-label"><span class="icon">🔹</span> IF</div>
+                    <div class="step-content">
+                        Journalists receive mentorship on gender stereotypes, produce investigative stories on gender movements, and are trained in ethical gender-sensitive reporting
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step then-step">
+                    <div class="step-label"><span class="icon">🔸</span> THEN</div>
+                    <div class="step-content">
+                        Media outlets will report more accurately on gender issues, expose disinformation campaigns, and counter harmful stereotypes in their coverage
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step therefore-step">
+                    <div class="step-label"><span class="icon">🔷</span> THEREFORE</div>
+                    <div class="step-content">
+                        Public narrative shifts away from harmful gender stereotypes, citizens gain access to fact-based information, and disinformation loses its influence
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step impact-step">
+                    <div class="step-label"><span class="icon">🎯</span> IMPACT CONTRIBUTION</div>
+                    <div class="step-content">
+                        Women, girls, and vulnerable groups are protected from media-driven discrimination and manipulation, strengthening their fundamental freedoms and well-being
+                    </div>
+                </div>
+            </div>
+
+            <!-- WP2 Pathway -->
+            <div class="pathway-card wp2">
+                <div class="wp-title">⚖️ WP2: Countering Legislative Setback</div>
+                
+                <div class="logic-step if-step">
+                    <div class="step-label"><span class="icon">🔹</span> IF</div>
+                    <div class="step-content">
+                        Constitutional Court judges participate in international study visits, attend workshops on international human rights legislation, and receive educational materials on gender-based violations
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step then-step">
+                    <div class="step-label"><span class="icon">🔸</span> THEN</div>
+                    <div class="step-content">
+                        The Constitutional Court will have enhanced capacity to recognize and prosecute gender-based violations, apply international human rights standards, and resist legislative rollbacks on women's and LGBTI rights
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step therefore-step">
+                    <div class="step-label"><span class="icon">🔷</span> THEREFORE</div>
+                    <div class="step-content">
+                        Legal protections for vulnerable groups are strengthened and enforced, creating accountability for violence and discrimination through the justice system
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step impact-step">
+                    <div class="step-label"><span class="icon">🎯</span> IMPACT CONTRIBUTION</div>
+                    <div class="step-content">
+                        Constitutional rights of women, girls, and vulnerable groups are safeguarded against backlash, ensuring their fundamental freedoms are legally protected and upheld
+                    </div>
+                </div>
+            </div>
+
+            <!-- WP3 Pathway -->
+            <div class="pathway-card wp3">
+                <div class="wp-title">🤝 WP3: Access to Services</div>
+                
+                <div class="logic-step if-step">
+                    <div class="step-label"><span class="icon">🔹</span> IF</div>
+                    <div class="step-content">
+                        Healthcare and social service providers receive training on non-discriminatory approaches, CSOs are trained in psychosocial/medical/legal assistance, and local services receive sub-grants in three municipalities
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step then-step">
+                    <div class="step-label"><span class="icon">🔸</span> THEN</div>
+                    <div class="step-content">
+                        Community-based services that are non-discriminatory, affordable, and responsive to specific needs of LGBTI, women, and children become available in local municipalities
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step therefore-step">
+                    <div class="step-label"><span class="icon">🔷</span> THEREFORE</div>
+                    <div class="step-content">
+                        Vulnerable and marginalized groups can access essential healthcare, social support, legal aid, and psychosocial services without facing discrimination or barriers
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step impact-step">
+                    <div class="step-label"><span class="icon">🎯</span> IMPACT CONTRIBUTION</div>
+                    <div class="step-content">
+                        Inequalities are reduced as women, girls, LGBTI persons, and vulnerable groups gain practical access to services that protect their well-being and fundamental rights
+                    </div>
+                </div>
+            </div>
+
+            <!-- WP4 Pathway -->
+            <div class="pathway-card wp4">
+                <div class="wp-title">📢 WP4: Communication & Awareness</div>
+                
+                <div class="logic-step if-step">
+                    <div class="step-label"><span class="icon">🔹</span> IF</div>
+                    <div class="step-content">
+                        Journalistic articles are published, social media campaigns expose fake narratives, and conferences/local advocacy meetings engage rights-holders and duty-bearers in three municipalities
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step then-step">
+                    <div class="step-label"><span class="icon">🔸</span> THEN</div>
+                    <div class="step-content">
+                        The general public, rights-holders, and duty-bearers gain accurate knowledge about gender-based violence, gender diversity, sexual education, and how to recognize and respond to threats
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step therefore-step">
+                    <div class="step-label"><span class="icon">🔷</span> THEREFORE</div>
+                    <div class="step-content">
+                        Misconceptions about gender and gender identity are dismantled, creating a more informed public that actively supports rather than threatens the rights of vulnerable groups
+                    </div>
+                </div>
+
+                <div class="arrow">⬇</div>
+
+                <div class="logic-step impact-step">
+                    <div class="step-label"><span class="icon">🎯</span> IMPACT CONTRIBUTION</div>
+                    <div class="step-content">
+                        Social attitudes shift to protect rather than harm vulnerable groups, creating an enabling environment for the fundamental freedoms and well-being of women, girls, and LGBTI persons
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

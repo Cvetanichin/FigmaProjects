@@ -1,7 +1,7 @@
 
-  # Untitled
+  # Project Progress Tracker
 
-  This is a code bundle for Untitled. The original project is available at https://www.figma.com/design/ZolD6mEBLco3eQRAp42IT2/Untitled.
+  This is a code bundle for Project Progress Tracker. The original project is available at https://www.figma.com/design/ZolD6mEBLco3eQRAp42IT2/Project-Progress-Tracker.
 
   ## Running the code
 

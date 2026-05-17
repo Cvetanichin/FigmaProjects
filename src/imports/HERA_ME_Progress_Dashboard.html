@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HERA Gender Equality Project - M&E Progress Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%);
+            padding: 20px;
+            color: #1E3A52;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1E3A52 0%, #2d5573 100%);
+            color: #F7F4ED;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(30, 58, 82, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .header .period {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(247, 244, 237, 0.3);
+        }
+
+        /* Overall Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--accent-color);
+        }
+
+        .summary-card .label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7a8a99;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .summary-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+
+        .summary-card .description {
+            font-size: 0.9rem;
+            color: #5d6d7e;
+            line-height: 1.4;
+        }
+
+        /* Impact Section */
+        .impact-section {
+            background: linear-gradient(135deg, #5B8A5A 0%, #6b9a6a 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(91, 138, 90, 0.3);
+        }
+
+        .impact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .impact-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .impact-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .impact-progress {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #D6B04D 0%, #e8c769 100%);
+            border-radius: 15px;
+            transition: width 1.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1E3A52;
+        }
+
+        .stakeholder-breakdown {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .stakeholder-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stakeholder-item .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stakeholder-item .type {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* Outcome Areas */
+        .outcomes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .outcome-card {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .outcome-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .outcome-header {
+            padding: 25px;
+            color: white;
+            position: relative;
+        }
+
+        .outcome-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .wp1 .outcome-header {
+            background: linear-gradient(135deg, #3498db 0%, #5dade2 100%);
+        }
+
+        .wp2 .outcome-header {
+            background: linear-gradient(135deg, #9b59b6 0%, #af7ac5 100%);
+        }
+
+        .wp3 .outcome-header {
+            background: linear-gradient(135deg, #e74c3c 0%, #ec7063 100%);
+        }
+
+        .wp4 .outcome-header {
+            background: linear-gradient(135deg, #f39c12 0%, #f8b739 100%);
+        }
+
+        .outcome-code {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .outcome-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .outcome-status {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .outcome-progress-section {
+            padding: 20px 25px;
+        }
+
+        .overall-progress {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .overall-progress .percentage {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1E3A52;
+            margin-bottom: 5px;
+        }
+
+        .overall-progress .label {
+            font-size: 0.85rem;
+            color: #7a8a99;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .indicators-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .indicator {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--indicator-color);
+            transition: background 0.3s ease;
+        }
+
+        .indicator:hover {
+            background: #e8eef3;
+        }
+
+        .indicator-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .indicator-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #5d6d7e;
+        }
+
+        .indicator-values {
+            display: flex;
+            gap: 15px;
+        }
+
+        .indicator-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-achieved {
+            background: #d5f4e6;
+            color: #1e8449;
+        }
+
+        .badge-ahead {
+            background: #d6eaf8;
+            color: #1a5490;
+        }
+
+        .badge-exceeded {
+            background: #fdebd0;
+            color: #b9770e;
+        }
+
+        .badge-scheduled {
+            background: #fadbd8;
+            color: #943126;
+        }
+
+        .badge-infrastructure {
+            background: #e8daef;
+            color: #6c3483;
+        }
+
+        .badge-launch {
+            background: #d5dbdb;
+            color: #1c2833;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            background: #1E3A52;
+            color: #F7F4ED;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            max-width: 300px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #7a8a99;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .summary-card, .outcome-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .summary-card:nth-child(1) { animation-delay: 0.1s; }
+        .summary-card:nth-child(2) { animation-delay: 0.2s; }
+        .summary-card:nth-child(3) { animation-delay: 0.3s; }
+        .summary-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .outcome-card:nth-child(1) { animation-delay: 0.2s; }
+        .outcome-card:nth-child(2) { animation-delay: 0.3s; }
+        .outcome-card:nth-child(3) { animation-delay: 0.4s; }
+        .outcome-card:nth-child(4) { animation-delay: 0.5s; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .impact-progress {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-card .value {
+                font-size: 2rem;
+            }
+
+            .overall-progress .percentage {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>HERA Gender Equality Project</h1>
+            <div class="subtitle">Building a Community of Human Rights Defenders to Promote Gender Equality in North Macedonia</div>
+            <div class="subtitle" style="font-size: 0.95rem; margin-top: 8px;">Implemented by HERA & Coalition Margins</div>
+            <div class="period">Year 1 Progress Report: January 1, 2025 - December 31, 2025</div>
+        </div>
+
+        <!-- Overall Summary -->
+        <div class="summary-grid">
+            <div class="summary-card" style="--accent-color: #5B8A5A;" data-tooltip="Overall project achievement rate across all outcome indicators. Strong performance in Year 1.">
+                <div class="label">Overall Progress</div>
+                <div class="value">68%</div>
+                <div class="description">Average across all outcome indicators</div>
+            </div>
+
+            <div class="summary-card" style="--accent-color: #D6B04D;" data-tooltip="8 indicators have met or exceeded their Year 1 targets, demonstrating excellent implementation performance.">
+                <div class="label">Targets Achieved</div>
+                <div class="value">40%</div>
+                <div class="description">8 out of 20 indicators achieved/exceeded</div>
+            </div>
+
+            <div class="summary-card" style="--accent-color: #3498db;" data-tooltip="7 indicators are progressing as planned toward their final targets by June 2027.">
+                <div class="label">On Track</div>
+                <div class="value">35%</div>
+                <div class="description">7 out of 20 indicators on schedule</div>
+            </div>
+
+            <div class="summary-card" style="--accent-color: #1E3A52;" data-tooltip="Project demonstrates strong implementation with excellent performance in Year 1 of a 30-month timeline.">
+                <div class="label">Overall Status</div>
+                <div class="value" style="font-size: 1.4rem; margin-top: 15px;">STRONG</div>
+                <div class="description">Robust foundation established</div>
+            </div>
+        </div>
+
+        <!-- Impact Section -->
+        <div class="impact-section">
+            <div class="impact-header">
+                <div class="impact-title">Impact: Stakeholder Mobilisation for Gender Equality</div>
+                <div class="impact-badge">✓ ON TRACK</div>
+            </div>
+            
+            <div class="impact-progress">
+                <div class="progress-bar-container">
+                    <div class="progress-stats">
+                        <span style="font-weight: 600;">60 of 300+ stakeholders engaged</span>
+                        <span style="font-weight: 700; font-size: 1.1rem;">20%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%;">20%</div>
+                    </div>
+                    <div style="margin-top: 12px; font-size: 0.9rem; opacity: 0.95;">
+                        Year 1 focused on capacity building. CBS launch in February 2026 will add 150+ beneficiaries, bringing total to 70% of target.
+                    </div>
+                </div>
+
+                <div class="stakeholder-breakdown">
+                    <div class="stakeholder-item" data-tooltip="4 male, 11 female journalists (ages 25-55) trained in gender-sensitive reporting standards">
+                        <div class="number">15</div>
+                        <div class="type">Journalists</div>
+                    </div>
+                    <div class="stakeholder-item" data-tooltip="5 male, 19 female Constitutional Court judges and administrative representatives (ages 37-61) trained on international standards">
+                        <div class="number">24</div>
+                        <div class="type">Court Judges</div>
+                    </div>
+                    <div class="stakeholder-item" data-tooltip="4 male, 17 female service providers and activists (ages 26-55) trained in non-discriminatory service delivery">
+                        <div class="number">21</div>
+                        <div class="type">Service Providers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Outcome Areas -->
+        <div class="outcomes-grid">
+            <!-- WP1: Media Partnerships -->
+            <div class="outcome-card wp1">
+                <div class="outcome-header">
+                    <div class="outcome-code">WP1</div>
+                    <div class="outcome-title">Media Partnerships and Accurate Information</div>
+                    <div class="outcome-status">EXCELLENT</div>
+                </div>
+                <div class="outcome-progress-section">
+                    <div class="overall-progress">
+                        <div class="percentage">94%</div>
+                        <div class="label">Overall Progress</div>
+                    </div>
+                    <div class="indicators-list">
+                        <div class="indicator" style="--indicator-color: #27ae60;" data-tooltip="All 5 media partnerships established 6 months ahead of schedule with MRT, SITEL TV, ALSAT TV, TV 24, and TELMA. Strong institutional buy-in secured.">
+                            <div class="indicator-name">Media Partnerships Established</div>
+                            <div class="indicator-stats">
+                                <div class="indicator-values">
+                                    <span><strong>Target:</strong> 5</span>
+                                    <span><strong>Current:</strong> 5</span>
+                                </div>
+                                <span class="indicator-badge badge-achieved">✓ Achieved</span>
+                            </div>
+                        </div>
+                        <div class="indicator" style="--indicator-color: #3498db;" data-tooltip="22 content pieces published in Year 1 (88% of 2-year target). Includes 20 news articles and 2 investigative stories, with 3 more investigations in production.">
+                            <div class="indicator-name">Journalistic Content Production</div>
+                            <div class="indicator-stats">
+                                <div class="indicator-values">
+                                    <span><strong>Target:</strong> 25</span>
+                                    <span><strong>Current:</strong> 22</span>
+                                </div>
+                                <span class="indicator-badge badge-ahead">↑ Ahead</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WP2: Constitutional Court -->
+            <div class="outcome-card wp2">
+                <div class="outcome-header">
+                    <div class="outcome-code">WP2</div>
+                    <div class="outcome-title">Constitutional Court Strengthening</div>
+                    <div class="outcome-status">STRONG PROGRESS</div>
+                </div>
+                <div class="outcome-progress-section">
+                    <div class="overall-progress">
+                        <div class="percentage">100%</div>
+                        <div class="label">On Completed Indicators</div>
+                    </div>
+                    <div class="indicators-list">
+                        <div class="indicator" style="--indicator-color: #f39c12;" data-tooltip="24 judges and administrative staff trained (200% of target). Full Court composition participated in April 2025 training on ECtHR jurisprudence and international standards.">
+                            <div class="indicator-name">Judges Trained on International Standards</div>
+                            <div class="indicator-stats">
+                                <div class="indicator-values">
+                                    <span><strong>Target:</strong> 12</span>
+                                    <span><strong>Current:</strong> 24</span>
+                                </div>
+                                <span class="indicator-badge badge-exceeded">✓✓ Exceeded</span>
+                            </div>
+                        </div>
+                        <div class="indicator" style="--indicator-color: #e74c3c;" data-tooltip="Study visit rescheduled from December 2025 to H1 2026. Partnership negotiations ongoing with constitutional courts in Germany, Slovenia, and Spain.">
+                            <div class="indicator-name">International Study Visit</div>
+                            <div class="indicator-stats">
+                                <div class="indicator-values">
+                                    <span><strong>Target:</strong> 12</span>
+                                    <span><strong>Current:</strong> 0</span>
+                                </div>
+                                <span class="indicator-badge badge-scheduled">H1 2026</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WP3: Community Services -->
+            <div class="outcome-card wp3">
+                <div class="outcome-header">
+                    <div class="outcome-code">WP3</div>
+                    <div class="outcome-title">Community-Based Services for Vulnerable Groups</div>
+                    <div class="outcome-status">ON SCHEDULE</div>
+                </div>
+                <div class="outcome-progress-section">
+                    <div class="overall-progress">
+                        <div class="percentage">75%</div>
+                        <div class="label">Infrastructure Ready</div>
+                    </div>
+                    <div class="indicators-list">
+                        <div class="indicator" style="--indicator-color: #9b59b6;" data-tooltip="All 3 CBS services established in Delčevo (CSO Žena), Kumanovo (Aksion Plus), and Strumica (Egal). Infrastructure complete, staff trained, launch February 2026.">
+                            <div class="indicator-name">CBS Services Operational</div>
+                            <div class="indicator-stats">
+                                <div class="indicator-values">
+                                    <span><strong>Target:</strong> 3</span>
+                                    <span><strong>Current:</strong> 3</span>
+                                </div>
+                                <span class="indicator-badge badge-infrastructure">Ready</span>
+                            </div>
+                        </div>
+                        <div class="indicator" style="--indicator-color: #95a5a6;" data-tooltip="Beneficiary enrollment begins February 2026 when services launch. Target: 150+ vulnerable individuals receiving non-discriminatory community-based support.">
+                            <div class="indicator-name">Beneficiaries Served</div>
+                            <div class="indicator-stats">
+                                <div class="indicator-values">
+                                    <span><strong>Target:</strong> 150+</span>
+                                    <span><strong>Current:</strong> 0</span>
+                                </div>
+                                <span class="indicator-badge badge-launch">Feb 2026</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WP4: Social Media -->
+            <div class="outcome-card wp4">
+                <div class="outcome-header">
+                    <div class="outcome-code">WP4</div>
+                    <div class="outcome-title">Social Media & Public Engagement</div>
+                    <div class="outcome-status">AHEAD OF SCHEDULE</div>
+                </div>
+                <div class="outcome-progress-section">
+                    <div class="overall-progress">
+                        <div class="percentage">72.5%</div>
+                        <div class="label">Overall Progress</div>
+                    </div>
+                    <div class="indicators-list">
+                        <div class="indicator" style="--indicator-color: #3498db;" data-tooltip="290,000 unique individuals reached through social media campaigns in Year 1 alone. Exceptional performance: 72.5% of final 400,000 target achieved in first year.">
+                            <div class="indicator-name">Social Media Reach</div>
+                            <div class="indicator-stats">
+                                <div class="indicator-values">
+                                    <span><strong>Target:</strong> 400K</span>
+                                    <span><strong>Current:</strong> 290K</span>
+                                </div>
+                                <span class="indicator-badge badge-ahead">↑ Ahead</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <strong>HERA Gender Equality Project</strong><br>
+            EU funded: NDICI-THE-NEAR/2024/461-308<br>
+            M&E Assessment Report | January 2026
+        </div>
+    </div>
+
+    <!-- Tooltip Element -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Initialize progress bar animation
+        window.addEventListener('load', () => {
+            const progressFill = document.querySelector('.progress-fill');
+            setTimeout(() => {
+                progressFill.style.width = '20%';
+            }, 500);
+        });
+
+        // Tooltip functionality
+        const tooltip = document.getElementById('tooltip');
+        const elementsWithTooltips = document.querySelectorAll('[data-tooltip]');
+
+        elementsWithTooltips.forEach(element => {
+            element.addEventListener('mouseenter', (e) => {
+                const text = element.getAttribute('data-tooltip');
+                tooltip.textContent = text;
+                tooltip.classList.add('show');
+                updateTooltipPosition(e);
+            });
+
+            element.addEventListener('mousemove', updateTooltipPosition);
+
+            element.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('show');
+            });
+        });
+
+        function updateTooltipPosition(e) {
+            const tooltipWidth = tooltip.offsetWidth;
+            const tooltipHeight = tooltip.offsetHeight;
+            
+            let left = e.clientX + 15;
+            let top = e.clientY + 15;
+
+            // Keep tooltip within viewport
+            if (left + tooltipWidth > window.innerWidth) {
+                left = e.clientX - tooltipWidth - 15;
+            }
+            
+            if (top + tooltipHeight > window.innerHeight) {
+                top = e.clientY - tooltipHeight - 15;
+            }
+
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+
+        // Click feedback
+        document.querySelectorAll('.summary-card, .outcome-card, .stakeholder-item, .indicator').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

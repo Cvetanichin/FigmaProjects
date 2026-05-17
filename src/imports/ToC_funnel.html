@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Funnel - North Macedonia Human Rights Initiative</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .funnel {
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .funnel-section {
+            position: relative;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .funnel-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .funnel-shape {
+            background: linear-gradient(45deg, #fff, #f8f9ff);
+            border: 3px solid #4a5568;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .funnel-shape::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .impact-section {
+            width: 95%;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+        }
+
+        .outcomes-section {
+            width: 85%;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .outputs-section {
+            width: 75%;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: #2d3748;
+        }
+
+        .activities-section {
+            width: 65%;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            color: #2d3748;
+        }
+
+        .beneficiaries-section {
+            width: 55%;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            color: #2d3748;
+        }
+
+        h2 {
+            margin: 0 0 15px 0;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            margin: 15px 0 10px 0;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .content-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .outcome-item, .output-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            border-left: 4px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .activity-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .activity-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .activity-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .activity-list li:last-child {
+            border-bottom: none;
+        }
+
+        .target-groups {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .target-group {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 2em;
+            color: #4a5568;
+            margin: 10px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .funnel-section {
+                width: 95% !important;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ Human Rights Protection Project</h1>
+            <p>North Macedonia Gender Equality & Human Rights Initiative</p>
+        </div>
+
+        <div class="funnel">
+            <!-- IMPACT -->
+            <div class="funnel-section impact-section">
+                <div class="funnel-shape">
+                    <h2>🎯 IMPACT</h2>
+                    <p style="font-size: 1.2em; font-weight: 500;">
+                        To protect the well-being, human rights and fundamental freedoms, with focus on girls, women and vulnerable groups in North Macedonia
+                    </p>
+                </div>
+            </div>
+
+            <div class="arrow">⬇</div>
+
+            <!-- OUTCOMES -->
+            <div class="funnel-section outcomes-section">
+                <div class="funnel-shape">
+                    <h2>🎲 OUTCOMES</h2>
+                    <div class="outcome-item">
+                        <strong>Outcome 1:</strong> Building alliances and partnerships with the media with a focus on the promotion of human rights and the prevention and protection from disinformation, manipulation and threats.
+                    </div>
+                    <div class="outcome-item">
+                        <strong>Outcome 2:</strong> Strengthening the judicial system of North Macedonia to protect women, vulnerable groups and human rights defenders from discrimination, hate speech, violence and attacks, with a focus on gender equality.
+                    </div>
+                    <div class="outcome-item">
+                        <strong>Outcome 3:</strong> To reduce inequalities by promoting and providing access to social services led by local CSOs and public institutions that respond to the specific needs of vulnerable people, including LGBTI, women and girls.
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">⬇</div>
+
+            <!-- OUTPUTS -->
+            <div class="funnel-section outputs-section">
+                <div class="funnel-shape">
+                    <h2>📊 OUTPUTS</h2>
+                    <div class="output-item">
+                        <strong>Output 1:</strong> The skills of media and journalists are increased to investigate and report on gender-related issues, appropriately respond to hate speech and gender stereotypes and provide access to accurate and fact-based information.
+                    </div>
+                    <div class="output-item">
+                        <strong>Output 2:</strong> The Constitutional Court can prosecute all instances of violence, to safeguard human dignity, prevent future human rights abuses, and implement relevant international standards and policies that protect social justice effectively.
+                    </div>
+                    <div class="output-item">
+                        <strong>Output 3:</strong> Non-discriminatory and affordable community-based services for vulnerable and marginalised groups are provided in three local municipalities, led by qualified practitioners and human rights defenders.
+                    </div>
+                    <div class="output-item">
+                        <strong>Intermediate Output:</strong> The General public, together with the right holders and duty bearers, can recognise gender based violence and adequately respond to the threats and better understand issues related to sexual education and gender diversity.
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">⬇</div>
+
+            <!-- ACTIVITIES -->
+            <div class="funnel-section activities-section">
+                <div class="funnel-shape">
+                    <h2>⚡ MAIN ACTIVITIES</h2>
+                    
+                    <div class="activity-group">
+                        <div class="activity-title">WP 1: Transformative role of media</div>
+                        <ul class="activity-list">
+                            <li>• Mentorship program for journalists on gender stereotypes, gender equality and exposing fake news</li>
+                            <li>• Production of investigative journalist stories on gender related movements</li>
+                            <li>• Training for journalists on ethical and gender sensitive reporting</li>
+                        </ul>
+                    </div>
+
+                    <div class="activity-group">
+                        <div class="activity-title">WP 2: Countering legislative setback</div>
+                        <ul class="activity-list">
+                            <li>• International study visit on preventing backlash in constitutional rights</li>
+                            <li>• Workshop on international human rights legislation for Constitutional Court</li>
+                            <li>• Development of educational materials for practitioners</li>
+                        </ul>
+                    </div>
+
+                    <div class="activity-group">
+                        <div class="activity-title">WP 3: Access to Services for marginalized communities</div>
+                        <ul class="activity-list">
+                            <li>• Training of healthcare and social service providers</li>
+                            <li>• Training for civil society organizations</li>
+                            <li>• Sub-granting scheme for local social services</li>
+                        </ul>
+                    </div>
+
+                    <div class="activity-group">
+                        <div class="activity-title">WP 4: Communication and awareness rising</div>
+                        <ul class="activity-list">
+                            <li>• Publishing journalistic articles and project content</li>
+                            <li>• Social media campaign exposing fake narratives</li>
+                            <li>• Conference on equality and safeguarding gender rights</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">⬇</div>
+
+            <!-- BENEFICIARIES -->
+            <div class="funnel-section beneficiaries-section">
+                <div class="funnel-shape">
+                    <h2>👥 FINAL BENEFICIARIES</h2>
+                    <div class="target-groups">
+                        <div class="target-group">🏳️‍🌈 LGBTI communities</div>
+                        <div class="target-group">👩 Women and girls</div>
+                        <div class="target-group">🏛️ Constitutional Court</div>
+                        <div class="target-group">📰 Media & journalists</div>
+                        <div class="target-group">🤝 CSOs & human rights activists</div>
+                        <div class="target-group">🏘️ Local municipalities</div>
+                        <div class="target-group">👥 General public</div>
+                        <div class="target-group">🏢 Social service centers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

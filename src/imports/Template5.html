@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Risk Management Template Builder</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Slate & Ochre
+         Background: Neutral slate/stone variants (bg-stone-50, bg-stone-100)
+         Primary Text: Stone-800
+         Borders: Stone-200
+         Accent Actions: Indigo-600 / Violet-600
+         Risk Badges: Dynamic Warm Alerts (Red for High, Amber for Medium, Emerald for Low)
+    -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#f5f5f4', // stone-100
+                            DEFAULT: '#44403c', // stone-700
+                            accent: '#6366f1', // indigo-600
+                            success: '#059669', // emerald-600
+                            warning: '#d97706', // amber-600
+                            danger: '#dc2626', // red-600
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Chart Container Rules: Constrained widths and responsive bounds to prevent layout shifts */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 550px;
+            height: 320px;
+            max-height: 350px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Interactive element transitions */
+        .interactive-tr:hover {
+            background-color: #fafaf9;
+        }
+
+        /* Responsive table constraints */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e7e5e4; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #d6d3d1; 
+        }
+
+        /* Color configurations for Risk levels */
+        .badge-high { background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .badge-medium { background-color: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+        .badge-low { background-color: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 antialiased selection:bg-indigo-600 selection:text-white">
+
+    <!-- Application Structure Plan:
+         1. Header: Modern, professional navigation with Quick Presets selectors to switch templates dynamically.
+         2. Configuration / Metadata Panel: Left-hand control panel to customize project variables (Title, Description, Categories).
+         3. Dynamic Analytics Workspace: Two interactive visual panels (Risk Scatter Matrix and Category distribution) update instantly.
+         4. Risk Register Form & Table Logger: Real-time table engine that allows adding, editing, cloning, and deleting risk entries with automatic recalculation.
+         5. Import/Export Console: Provides easy access to copy/paste raw configurations or directly download customized templates as portable JSON profiles.
+    -->
+
+    <!-- Visualization & Content Choices:
+         - Project Info: Dynamic metadata fields -> Interactive Form Bindings -> Immediate UI header updates.
+         - Risk Matrix: Goals: Visualize Severity -> Chart.js Scatter Plot with Jitter -> Displays risk density -> Dynamic color-coded levels.
+         - Risk Allocation: Goals: Show Category Ratios -> Chart.js Doughnut -> Responsive legends -> Instantly reflects added categories.
+         - Table Logger: Goals: Create, Read, Update, Delete -> Vanilla JS Table Engine with Live Filter Controls -> Seamless UI synchronization.
+         - Portfolio/Presets: Goals: Onboard quickly -> Multi-Domain Presets (Advocacy, Digital Workspace/AI, General Project) -> Instantly swaps operational models.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Top Navigation Header -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo & Brand Info -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-600 text-white p-2 rounded-lg font-bold text-sm tracking-widest">RM-TF</div>
+                    <div>
+                        <h1 class="text-base font-bold text-stone-900 tracking-tight">Risk Management Framework</h1>
+                        <p class="text-[10px] text-stone-400 font-mono">WORKSPACE TEMPLATE BUILDER</p>
+                    </div>
+                </div>
+
+                <!-- Live Presets Selector -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-stone-500 font-medium hidden md:inline">Quick Templates:</span>
+                    <div class="flex bg-stone-100 rounded-lg p-0.5 border border-stone-200">
+                        <button onclick="loadPreset('advocacy')" class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all focus:outline-none focus:ring-1 focus:ring-indigo-500 hover:bg-white" id="preset-advocacy">Human Rights</button>
+                        <button onclick="loadPreset('workspace')" class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all focus:outline-none focus:ring-1 focus:ring-indigo-500 hover:bg-white" id="preset-workspace">Digital/AI</button>
+                        <button onclick="loadPreset('general')" class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all focus:outline-none focus:ring-1 focus:ring-indigo-500 hover:bg-white" id="preset-general">General</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <!-- Interactive Intro Header -->
+        <section class="bg-gradient-to-r from-stone-900 via-stone-800 to-indigo-950 rounded-2xl p-8 text-white shadow-lg space-y-4">
+            <div class="inline-block bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs px-2.5 py-1 rounded-full font-semibold uppercase tracking-wider">
+                Flexible Project Tool
+            </div>
+            <div class="space-y-2">
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight" id="display-project-title">Dynamic Project Template</h2>
+                <p class="text-stone-300 text-sm md:text-base max-w-4xl" id="display-project-desc">
+                    Configure your project goals, categories, and risks below. This customizable tool helps you model threat scenarios, track mitigation tactics, and save structured profiles for your organizational workflows.
+                </p>
+            </div>
+            <div class="flex flex-wrap gap-4 text-xs font-mono text-stone-400 pt-2 border-t border-stone-800">
+                <div>SPONSOR: <span class="text-white font-medium" id="display-project-sponsor">-</span></div>
+                <div>VERSION: <span class="text-white font-medium" id="display-project-version">-</span></div>
+                <div>LAST SAVED: <span class="text-white font-medium" id="display-project-date">-</span></div>
+            </div>
+        </section>
+
+        <!-- Project Config & Real-Time Visualization Blocks -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Metadata & Settings Settings Form -->
+            <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-6 lg:col-span-1">
+                <div class="border-b border-stone-100 pb-4">
+                    <h3 class="text-base font-bold text-stone-900">1. Project Metadata Settings</h3>
+                    <p class="text-xs text-stone-500">Customize the headers, tracking details, and active operational risk categories.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Project Name</label>
+                        <input type="text" id="input-title" oninput="syncMetadata()" class="w-full text-sm p-2.5 bg-stone-50 border border-stone-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-stone-800" placeholder="e.g., Campaign Framework 2026">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Description</label>
+                        <textarea id="input-desc" oninput="syncMetadata()" rows="3" class="w-full text-sm p-2.5 bg-stone-50 border border-stone-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-stone-800" placeholder="Describe the focus scope, legal frameworks, or technological integrations."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Sponsor</label>
+                            <input type="text" id="input-sponsor" oninput="syncMetadata()" class="w-full text-xs p-2.5 bg-stone-50 border border-stone-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-stone-800" placeholder="e.g., EU Commission">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Version</label>
+                            <input type="text" id="input-version" oninput="syncMetadata()" class="w-full text-xs p-2.5 bg-stone-50 border border-stone-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-stone-800" placeholder="e.g., v1.0">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Editable Risk Categories</label>
+                        <input type="text" id="input-categories" onchange="updateCategoriesFromInput()" class="w-full text-xs p-2.5 bg-stone-50 border border-stone-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-stone-800 font-mono" placeholder="Security, Admin, Political">
+                        <p class="text-[10px] text-stone-400 mt-1">Comma-separated values. These populate the table dropdowns.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization: Heatmap Coordinates -->
+            <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col lg:col-span-1">
+                <div class="mb-4">
+                    <h3 class="text-base font-bold text-stone-900">2. Interactive Risk Matrix</h3>
+                    <p class="text-xs text-stone-500">Scatter distribution map based on Likelihood vs. Impact values.</p>
+                </div>
+                <div class="chart-container flex-grow">
+                    <canvas id="matrixChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Visualization: Category Share -->
+            <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col lg:col-span-1">
+                <div class="mb-4">
+                    <h3 class="text-base font-bold text-stone-900">3. Category Share</h3>
+                    <p class="text-xs text-stone-500">Distribution proportion computed instantly as items are updated.</p>
+                </div>
+                <div class="chart-container flex-grow">
+                    <canvas id="shareChart"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Dynamic Risk Builder Controls & Grid -->
+        <section class="space-y-4">
+            
+            <!-- Live Action Controllers -->
+            <div class="bg-white border border-stone-200 p-5 rounded-xl flex flex-wrap items-center justify-between gap-4 shadow-sm">
+                <div class="space-y-1">
+                    <h3 class="text-base font-bold text-stone-900">Risk Matrix Logger</h3>
+                    <p class="text-xs text-stone-500">Add, edit, and filter your program-specific risks dynamically.</p>
+                </div>
+
+                <!-- Live Table Filters and Quick Add Button -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <select id="filter-category" onchange="applyFilters()" class="text-xs bg-stone-100 border border-stone-300 text-stone-700 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500">
+                        <option value="All">All Categories</option>
+                    </select>
+
+                    <select id="filter-severity" onchange="applyFilters()" class="text-xs bg-stone-100 border border-stone-300 text-stone-700 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500">
+                        <option value="All">All Severity Levels</option>
+                        <option value="High">High Severity Only</option>
+                        <option value="Medium">Medium Severity Only</option>
+                        <option value="Low">Low Severity Only</option>
+                    </select>
+
+                    <button onclick="openAddModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow transition-colors flex items-center gap-1.5">
+                        <span class="text-sm font-bold">+</span> Add New Risk
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-sm text-left text-stone-600">
+                        <thead class="text-xs text-stone-700 uppercase bg-stone-100 border-b border-stone-200">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 w-16">ID</th>
+                                <th scope="col" class="px-6 py-4 w-1/4">Risk Description</th>
+                                <th scope="col" class="px-6 py-4 w-40">Category</th>
+                                <th scope="col" class="px-6 py-4 w-32">Likelihood</th>
+                                <th scope="col" class="px-6 py-4 w-32">Impact</th>
+                                <th scope="col" class="px-6 py-4">Mitigation Strategy</th>
+                                <th scope="col" class="px-6 py-4 w-24">Status</th>
+                                <th scope="col" class="px-6 py-4 w-28 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="risk-table-body" class="divide-y divide-stone-200">
+                            <!-- Dynamic Rows -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer Summary Metric Counter -->
+                <div class="bg-stone-50 px-6 py-4 border-t border-stone-200 text-xs text-stone-500 flex flex-wrap justify-between items-center gap-2 font-mono">
+                    <div>DISPLAYING: <span id="meta-display-count" class="font-bold text-stone-800">0</span> OF <span id="meta-total-count" class="font-bold text-stone-800">0</span> RISK ENTRIES</div>
+                    <div class="flex gap-4">
+                        <div>HIGH IMPACT: <span id="meta-high-count" class="text-red-600 font-bold">0</span></div>
+                        <div>MEDIUM IMPACT: <span id="meta-med-count" class="text-amber-600 font-bold">0</span></div>
+                        <div>LOW IMPACT: <span id="meta-low-count" class="text-emerald-600 font-bold">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Template Import & Export Utilities Console -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Export Hub -->
+            <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                <div class="border-b border-stone-100 pb-3">
+                    <h3 class="text-base font-bold text-stone-900">💾 Template Export Hub</h3>
+                    <p class="text-xs text-stone-500">Copy the workspace parameters or download the Portable Profile JSON for backup.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <textarea id="export-json-output" readonly rows="5" class="w-full text-xs p-3 bg-stone-50 border border-stone-200 rounded-lg text-stone-600 font-mono focus:outline-none"></textarea>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="copyExportJson()" class="bg-stone-800 hover:bg-stone-900 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors">
+                            Copy JSON Code
+                        </button>
+                        <button onclick="downloadJSONFile()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow transition-colors">
+                            Download Profile (.json)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import Hub -->
+            <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                <div class="border-b border-stone-100 pb-3">
+                    <h3 class="text-base font-bold text-stone-900">📥 Template Import Console</h3>
+                    <p class="text-xs text-stone-500">Paste an existing Portable Profile JSON configuration to load it into this interactive workspace.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <textarea id="import-json-input" rows="5" class="w-full text-xs p-3 bg-stone-50 border border-stone-300 rounded-lg text-stone-800 font-mono focus:ring-1 focus:ring-indigo-500 placeholder-stone-400" placeholder="Paste your generated JSON payload string here..."></textarea>
+                    
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <button onclick="importJsonConfig()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow transition-colors">
+                            Apply JSON Payload
+                        </button>
+                        <span id="import-error" class="text-xs text-red-600 font-semibold hidden">Invalid Schema Payload.</span>
+                        <span id="import-success" class="text-xs text-emerald-600 font-semibold hidden">Loaded successfully!</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Methodology Explanation -->
+        <section class="bg-white p-8 rounded-xl border border-stone-200 shadow-sm space-y-6">
+            <h3 class="text-lg font-bold text-stone-900 border-b border-stone-200 pb-3">Operational Risk Management Methodology</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-stone-600">
+                <div class="space-y-2">
+                    <h4 class="font-bold text-indigo-600">The Purpose of the Matrix</h4>
+                    <p class="leading-relaxed">
+                        A risk matrix is an assessment tool that allows organizations to define the probability and severity parameters of key hazards. By visualizing threats, leaders can allocate contingency reserves and deploy proactive mitigations.
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="font-bold text-indigo-600">Interactive Framework Variables</h4>
+                    <p class="leading-relaxed">
+                        <strong>Likelihood (1-3):</strong> Represents Probability. High likelihood (3) implies a routine exposure, Medium (2) is occasional, and Low (1) is highly rare.<br>
+                        <strong>Impact (1-3):</strong> Represents Severity. High severity (3) might collapse workspace functions, Medium (2) causes operational delays, and Low (1) causes minor friction.
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="font-bold text-indigo-600">Adaptive Mitigation Workflows</h4>
+                    <p class="leading-relaxed">
+                        Any template setup should align with structured reporting protocols. Leverage standard P.A.R.A indexing to organize safety checklists, contingency plans, and legal assets across folders for quick retrieval during escalations.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Interactive Builder Modal (Add / Edit) -->
+    <div id="risk-modal" class="fixed inset-0 z-50 overflow-y-auto hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl border border-stone-200 shadow-2xl max-w-lg w-full overflow-hidden">
+            <div class="bg-stone-900 text-white p-5 flex justify-between items-center">
+                <h4 id="modal-title" class="text-sm font-bold uppercase tracking-wider">Configure Risk Object</h4>
+                <button onclick="closeModal()" class="text-stone-400 hover:text-white font-mono text-lg font-bold">✕</button>
+            </div>
+            
+            <form id="risk-form" onsubmit="saveRiskForm(event)" class="p-6 space-y-4">
+                <input type="hidden" id="modal-risk-index" value="-1">
+                
+                <div class="grid grid-cols-4 gap-3">
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Risk ID</label>
+                        <input type="text" id="modal-id" required class="w-full text-xs p-2.5 bg-stone-50 border border-stone-300 rounded-lg text-stone-800 font-mono uppercase" placeholder="R-1">
+                    </div>
+                    <div class="col-span-3">
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Category</label>
+                        <select id="modal-category" required class="w-full text-xs p-2.5 bg-stone-50 border border-stone-300 rounded-lg text-stone-800 focus:ring-1 focus:ring-indigo-500">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Risk Description</label>
+                    <input type="text" id="modal-risk" required class="w-full text-xs p-2.5 bg-stone-50 border border-stone-300 rounded-lg text-stone-800" placeholder="e.g., Delay in third-party API processing pipelines.">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Likelihood</label>
+                        <select id="modal-prob" class="w-full text-xs p-2.5 bg-stone-50 border border-stone-300 rounded-lg text-stone-800">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Impact</label>
+                        <select id="modal-impact" class="w-full text-xs p-2.5 bg-stone-50 border border-stone-300 rounded-lg text-stone-800">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Mitigation Strategy</label>
+                    <textarea id="modal-mitigation" rows="2" class="w-full text-xs p-2.5 bg-stone-50 border border-stone-300 rounded-lg text-stone-800" placeholder="e.g., Cache critical values locally, setup auto-retry on server..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Operational Status</label>
+                    <select id="modal-status" class="w-full text-xs p-2.5 bg-stone-50 border border-stone-300 rounded-lg text-stone-800">
+                        <option value="Active">Active / Unmitigated</option>
+                        <option value="Mitigated">Mitigated / Managed</option>
+                        <option value="Planned">Planned Action</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-4 border-t border-stone-100">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow transition-colors">Save Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Active Template Controller Logic -->
+    <script>
+        // Preset Configurations to show power, variety, and placeholders
+        const templates = {
+            advocacy: {
+                title: "Human Rights Advocacy Project Framework",
+                description: "Operational safety tracker built for grassroots coalitions. Designed to handle cyber intimidation, security breaches, and civic space restriction mitigations.",
+                sponsor: "Civil Space Alliance",
+                version: "1.4.0",
+                date: "2026-05-17",
+                categories: ["Security", "Political", "Operational", "Financial"],
+                risks: [
+                    { id: "SEC-1", category: "Security", risk: "Digital targeted harassment of local coalition defenders", prob: "High", impact: "High", mitigation: "Enforce multi-factor verification, run local device security audits, provide anonymous safety logs.", status: "Active" },
+                    { id: "SEC-2", category: "Security", risk: "Physical safety breach during open-air public campaign activities", prob: "Medium", impact: "High", mitigation: "Establish active Police protocols, map primary emergency exit pathways, set safe staging locations.", status: "Active" },
+                    { id: "POL-1", category: "Political", risk: "Regulatory legislative changes limit regional operation rules", prob: "Medium", impact: "High", mitigation: "Diversify legal entities, register alternate hosting jurisdictions, secure external escrow funds.", status: "Mitigated" },
+                    { id: "OPS-1", category: "Operational", risk: "Delay in disbursement of international sub-grant aid", prob: "High", impact: "Medium", mitigation: "Run standard compliance reviews quarterly; build rolling three-month operational buffers.", status: "Planned" }
+                ]
+            },
+            workspace: {
+                title: "AI Workspace & Automation Infrastructure",
+                description: "System blueprint to track data integration friction, AI rate limitation policies, P.A.R.A. document organization discrepancies, and key automation failures.",
+                sponsor: "Independent Research Lab",
+                version: "2.1.2",
+                date: "2026-05-17",
+                categories: ["Technical", "Data Quality", "Administrative", "Systemic"],
+                risks: [
+                    { id: "TECH-1", category: "Technical", risk: "OpenAI/Gemini API service timeout or limit exhaustion on execution", prob: "High", impact: "Medium", mitigation: "Implement exponential backoff logic; load-balance API calls with a fallback backup node.", status: "Active" },
+                    { id: "DATA-1", category: "Data Quality", risk: "Incorrect metadata tags lead to faulty P.A.R.A file sorting", prob: "Medium", impact: "High", mitigation: "Pre-validate directory schema with structured JSON Schema output configs.", status: "Mitigated" },
+                    { id: "SYS-1", category: "Systemic", risk: "Authentication token expiry breaks multi-step Google Workspace routines", prob: "Medium", impact: "High", mitigation: "Implement OAuth token auto-renewal triggers with automated workspace email alert.", status: "Planned" }
+                ]
+            },
+            general: {
+                title: "Enterprise Project Operational Registry",
+                description: "Clean general placeholder config. Perfect starting baseline for software rollouts, marketing campaigns, or standard corporate workflow mappings.",
+                sponsor: "Sponsor Placeholder Inc.",
+                version: "1.0.0",
+                date: "2026-05-17",
+                categories: ["Management", "Budget", "Legal", "Technology"],
+                risks: [
+                    { id: "R-1", category: "Management", risk: "Core staff members turn over mid-lifecycle", prob: "Medium", impact: "High", mitigation: "Conduct knowledge handoffs immediately, organize functional cross-trainings.", status: "Active" },
+                    { id: "R-2", category: "Budget", risk: "Third-party license fees scale beyond projected target parameters", prob: "Low", impact: "High", mitigation: "Lock multi-year price ceilings, build scalable contract options.", status: "Mitigated" },
+                    { id: "R-3", category: "Technology", risk: "Target database migration takes longer than initial estimation window", prob: "Medium", impact: "Medium", mitigation: "Run incremental test environments, complete dry runs during low-traffic periods.", status: "Planned" }
+                ]
+            }
+        };
+
+        // Active State
+        let activeProject = {};
+        let matrixChartInstance = null;
+        let shareChartInstance = null;
+
+        // Load Preset into active workspace
+        function loadPreset(key) {
+            // Deep copy preset
+            activeProject = JSON.parse(JSON.stringify(templates[key]));
+            
+            // Set buttons active/inactive
+            ['advocacy', 'workspace', 'general'].forEach(p => {
+                const btn = document.getElementById(`preset-${p}`);
+                if (p === key) {
+                    btn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+                    btn.classList.remove('text-stone-500');
+                } else {
+                    btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                    btn.classList.add('text-stone-500');
+                }
+            });
+
+            // Populate workspace
+            document.getElementById('input-title').value = activeProject.title;
+            document.getElementById('input-desc').value = activeProject.description;
+            document.getElementById('input-sponsor').value = activeProject.sponsor;
+            document.getElementById('input-version').value = activeProject.version;
+            document.getElementById('input-categories').value = activeProject.categories.join(', ');
+
+            syncMetadata();
+            rebuildFilterDropdowns();
+            applyFilters();
+            refreshVisualizations();
+        }
+
+        // Apply input settings back to state metadata headers
+        function syncMetadata() {
+            activeProject.title = document.getElementById('input-title').value;
+            activeProject.description = document.getElementById('input-desc').value;
+            activeProject.sponsor = document.getElementById('input-sponsor').value;
+            activeProject.version = document.getElementById('input-version').value;
+            activeProject.date = new Date().toISOString().split('T')[0];
+
+            document.getElementById('display-project-title').innerText = activeProject.title || "Project Risk Workspace";
+            document.getElementById('display-project-desc').innerText = activeProject.description || "Describe the active scope and key compliance details here.";
+            document.getElementById('display-project-sponsor').innerText = activeProject.sponsor || "N/A";
+            document.getElementById('display-project-version').innerText = activeProject.version || "0.0.0";
+            document.getElementById('display-project-date').innerText = activeProject.date;
+
+            updateExportOutput();
+        }
+
+        // Parse list categories input field
+        function updateCategoriesFromInput() {
+            const raw = document.getElementById('input-categories').value;
+            activeProject.categories = raw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            rebuildFilterDropdowns();
+            applyFilters();
+            refreshVisualizations();
+        }
+
+        function rebuildFilterDropdowns() {
+            const catSelect = document.getElementById('filter-category');
+            const modalCatSelect = document.getElementById('modal-category');
+
+            // Store current selection if possible
+            const selectedVal = catSelect.value;
+
+            catSelect.innerHTML = '<option value="All">All Categories</option>';
+            modalCatSelect.innerHTML = '';
+
+            activeProject.categories.forEach(c => {
+                catSelect.innerHTML += `<option value="${c}">${c}</option>`;
+                modalCatSelect.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+
+            // Restore selection if still available
+            if (activeProject.categories.includes(selectedVal)) {
+                catSelect.value = selectedVal;
+            } else {
+                catSelect.value = 'All';
+            }
+        }
+
+        // Apply filters to table views and updates indicators
+        function applyFilters() {
+            const catVal = document.getElementById('filter-category').value;
+            const sevVal = document.getElementById('filter-severity').value;
+
+            const filtered = activeProject.risks.filter(r => {
+                const matchCat = catVal === 'All' || r.category === catVal;
+                let matchSev = true;
+                if (sevVal === 'High') matchSev = (r.impact === 'High');
+                if (sevVal === 'Medium') matchSev = (r.impact === 'Medium');
+                if (sevVal === 'Low') matchSev = (r.impact === 'Low');
+                
+                return matchCat && matchSev;
+            });
+
+            renderTable(filtered);
+            updateSummaryKPIs();
+        }
+
+        // Render tabular structures dynamically
+        function renderTable(data) {
+            const tbody = document.getElementById('risk-table-body');
+            tbody.innerHTML = '';
+
+            data.forEach((r, idx) => {
+                const actualIndex = activeProject.risks.indexOf(r);
+
+                const row = document.createElement('tr');
+                row.className = "interactive-tr border-b border-stone-100 transition-all";
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-mono text-xs font-bold text-stone-900">${r.id}</td>
+                    <td class="px-6 py-4">
+                        <div class="text-xs font-semibold text-stone-900 leading-normal">${r.risk}</div>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-stone-500">${r.category}</td>
+                    <td class="px-6 py-4">
+                        <span class="inline-block px-2.5 py-1 text-[10px] font-bold uppercase rounded ${getBadgeClass(r.prob)}">${r.prob}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-block px-2.5 py-1 text-[10px] font-bold uppercase rounded ${getBadgeClass(r.impact)}">${r.impact}</span>
+                    </td>
+                    <td class="px-6 py-4 text-xs leading-relaxed text-stone-600">${r.mitigation}</td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${r.status === 'Active' ? 'bg-amber-50 text-amber-700 border border-amber-200' : r.status === 'Mitigated' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-700 border border-stone-200'}">
+                            ${r.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button onclick="editRisk(${actualIndex})" title="Edit Entry" class="text-stone-400 hover:text-indigo-600 font-semibold text-xs py-1 px-1.5 rounded hover:bg-stone-100 transition-all">✏️</button>
+                            <button onclick="cloneRisk(${actualIndex})" title="Duplicate Entry" class="text-stone-400 hover:text-emerald-600 font-semibold text-xs py-1 px-1.5 rounded hover:bg-stone-100 transition-all">📋</button>
+                            <button onclick="deleteRisk(${actualIndex})" title="Remove Entry" class="text-stone-400 hover:text-red-600 font-semibold text-xs py-1 px-1.5 rounded hover:bg-stone-100 transition-all">✕</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('meta-display-count').innerText = data.length;
+        }
+
+        function getBadgeClass(level) {
+            if (level === 'High') return 'badge-high';
+            if (level === 'Medium') return 'badge-medium';
+            return 'badge-low';
+        }
+
+        // Compute metrics values
+        function updateSummaryKPIs() {
+            const risks = activeProject.risks;
+            document.getElementById('meta-total-count').innerText = risks.length;
+
+            const high = risks.filter(r => r.impact === 'High').length;
+            const med = risks.filter(r => r.impact === 'Medium').length;
+            const low = risks.filter(r => r.impact === 'Low').length;
+
+            document.getElementById('meta-high-count').innerText = high;
+            document.getElementById('meta-med-count').innerText = med;
+            document.getElementById('meta-low-count').innerText = low;
+        }
+
+        // Refresh Chart Visualizations Dynamically
+        function refreshVisualizations() {
+            // Helper convert String to coordinates value
+            const levelVal = (val) => {
+                if(val === 'High') return 3;
+                if(val === 'Medium') return 2;
+                return 1;
+            };
+
+            // Calculate Jitter
+            const scatterPoints = activeProject.risks.map(r => {
+                // Generates small jitter inside coordinate bound
+                const jitterX = Math.random() * 0.4 - 0.2;
+                const jitterY = Math.random() * 0.4 - 0.2;
+                return {
+                    x: levelVal(r.prob) + jitterX,
+                    y: levelVal(r.impact) + jitterY,
+                    r: 9,
+                    id: r.id,
+                    description: r.risk,
+                    category: r.category
+                };
+            });
+
+            // 1. Matrix Scatter Plot
+            if (matrixChartInstance) matrixChartInstance.destroy();
+            const ctx1 = document.getElementById('matrixChart').getContext('2d');
+            matrixChartInstance = new Chart(ctx1, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Threat Profile Objects',
+                        data: scatterPoints,
+                        backgroundColor: (ctx) => {
+                            const val = ctx.raw?.y;
+                            if (val > 2.4) return 'rgba(220, 38, 38, 0.7)'; // High (Red)
+                            if (val > 1.4) return 'rgba(217, 119, 6, 0.7)'; // Medium (Amber)
+                            return 'rgba(5, 150, 105, 0.7)'; // Low (Emerald)
+                        },
+                        borderWidth: 1,
+                        borderColor: 'rgba(0, 0, 0, 0.1)'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: {
+                        x: {
+                            min: 0.5,
+                            max: 3.5,
+                            title: { display: true, text: 'Likelihood', font: { size: 10, weight: 'bold' } },
+                            ticks: {
+                                callback: (val) => ['','Low','Medium','High',''][val] || '',
+                                stepSize: 1
+                            }
+                        },
+                        y: {
+                            min: 0.5,
+                            max: 3.5,
+                            title: { display: true, text: 'Impact', font: { size: 10, weight: 'bold' } },
+                            ticks: {
+                                callback: (val) => ['','Low','Medium','High',''][val] || '',
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `[${ctx.raw.id}] ${ctx.raw.description.substring(0, 30)}...`
+                            }
+                        },
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // 2. Category Share Doughnut
+            const categoryCounts = {};
+            activeProject.categories.forEach(c => categoryCounts[c] = 0);
+            activeProject.risks.forEach(r => {
+                if(categoryCounts[r.category] !== undefined) {
+                    categoryCounts[r.category]++;
+                } else {
+                    categoryCounts[r.category] = 1; // Catch new dynamic added cats
+                }
+            });
+
+            if (shareChartInstance) shareChartInstance.destroy();
+            const ctx2 = document.getElementById('shareChart').getContext('2d');
+            shareChartInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryCounts),
+                    datasets: [{
+                        data: Object.values(categoryCounts),
+                        backgroundColor: [
+                            '#6366f1', // Indigo
+                            '#0d9488', // Teal
+                            '#f59e0b', // Amber
+                            '#ec4899', // Pink
+                            '#14b8a6', // Turquoise
+                            '#3b82f6'  // Blue
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+                    }
+                }
+            });
+
+            updateExportOutput();
+        }
+
+        // Open Dialog Modal to Add New Risk Object
+        function openAddModal() {
+            document.getElementById('modal-title').innerText = "Configure Risk Object";
+            document.getElementById('modal-risk-index').value = "-1";
+            document.getElementById('risk-form').reset();
+            
+            // Generate basic unique ID recommendation
+            const prefix = activeProject.categories[0] ? activeProject.categories[0].substring(0,3).toUpperCase() : "R";
+            const num = activeProject.risks.length + 1;
+            document.getElementById('modal-id').value = `${prefix}-${num}`;
+
+            document.getElementById('risk-modal').classList.remove('hidden');
+        }
+
+        // Edit Risk Dialog Modal
+        function editRisk(index) {
+            const risk = activeProject.risks[index];
+            document.getElementById('modal-title').innerText = "Edit Operational Risk Details";
+            document.getElementById('modal-risk-index').value = index;
+            
+            document.getElementById('modal-id').value = risk.id;
+            document.getElementById('modal-category').value = risk.category;
+            document.getElementById('modal-risk').value = risk.risk;
+            document.getElementById('modal-prob').value = risk.prob;
+            document.getElementById('modal-impact').value = risk.impact;
+            document.getElementById('modal-mitigation').value = risk.mitigation;
+            document.getElementById('modal-status').value = risk.status;
+
+            document.getElementById('risk-modal').classList.remove('hidden');
+        }
+
+        // Duplicate and Create a copy of risk
+        function cloneRisk(index) {
+            const original = activeProject.risks[index];
+            const cloned = JSON.parse(JSON.stringify(original));
+            cloned.id = `${original.id}-COPY`;
+            
+            activeProject.risks.push(cloned);
+            applyFilters();
+            refreshVisualizations();
+        }
+
+        // Delete Risk Object
+        function deleteRisk(index) {
+            if (confirm("Are you sure you want to remove this risk entry from the matrix?")) {
+                activeProject.risks.splice(index, 1);
+                applyFilters();
+                refreshVisualizations();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('risk-modal').classList.add('hidden');
+        }
+
+        // Form Submit Actions
+        function saveRiskForm(e) {
+            e.preventDefault();
+            const index = parseInt(document.getElementById('modal-risk-index').value);
+
+            const record = {
+                id: document.getElementById('modal-id').value.toUpperCase().trim(),
+                category: document.getElementById('modal-category').value,
+                risk: document.getElementById('modal-risk').value,
+                prob: document.getElementById('modal-prob').value,
+                impact: document.getElementById('modal-impact').value,
+                mitigation: document.getElementById('modal-mitigation').value || "No baseline protocol listed.",
+                status: document.getElementById('modal-status').value
+            };
+
+            if (index === -1) {
+                // Push new object
+                activeProject.risks.push(record);
+            } else {
+                // Update existing values
+                activeProject.risks[index] = record;
+            }
+
+            closeModal();
+            applyFilters();
+            refreshVisualizations();
+        }
+
+        // Handle JSON Export structures
+        function updateExportOutput() {
+            document.getElementById('export-json-output').value = JSON.stringify(activeProject, null, 2);
+        }
+
+        function copyExportJson() {
+            const textElement = document.getElementById('export-json-output');
+            textElement.select();
+            document.execCommand('copy');
+            alert('Risk Profile configuration string copied to clipboard successfully.');
+        }
+
+        // Port Export JSON to client download
+        function downloadJSONFile() {
+            const payload = JSON.stringify(activeProject, null, 2);
+            const blob = new Blob([payload], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const sanitizedName = activeProject.title.toLowerCase().replace(/[^a-z0-9]/g, "_");
+            const filename = `${sanitizedName}_risk_profile.json`;
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Handle JSON Import configurations
+        function importJsonConfig() {
+            const rawPayload = document.getElementById('import-json-input').value;
+            const errSpan = document.getElementById('import-error');
+            const successSpan = document.getElementById('import-success');
+
+            errSpan.classList.add('hidden');
+            successSpan.classList.add('hidden');
+
+            try {
+                const parsed = JSON.parse(rawPayload);
+
+                // Minimal validation of JSON Schema parameters
+                if (!parsed.title || !parsed.risks || !Array.isArray(parsed.risks) || !parsed.categories) {
+                    throw new Error("Missing structural values in schema payload.");
+                }
+
+                // Apply values directly
+                activeProject = parsed;
+
+                document.getElementById('input-title').value = activeProject.title;
+                document.getElementById('input-desc').value = activeProject.description || "";
+                document.getElementById('input-sponsor').value = activeProject.sponsor || "";
+                document.getElementById('input-version').value = activeProject.version || "";
+                document.getElementById('input-categories').value = activeProject.categories.join(', ');
+
+                syncMetadata();
+                rebuildFilterDropdowns();
+                applyFilters();
+                refreshVisualizations();
+
+                successSpan.classList.remove('hidden');
+            } catch (err) {
+                errSpan.classList.remove('hidden');
+                console.error("Payload Import Failure: ", err);
+            }
+        }
+
+        // Bootstrap Application Initialization
+        window.onload = function() {
+            // Default load the Advocacy Profile
+            loadPreset('advocacy');
+        };
+    </script>
+</body>
+</html>
