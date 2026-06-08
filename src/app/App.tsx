@@ -39,13 +39,15 @@ function AppRoutes() {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="projects" element={<Projects />} />
-        <Route path="projects/:id" element={<ProjectDetail />} />
-        <Route path="projects/:id/activities" element={<Activities />} />
-        <Route path="projects/:id/indicators" element={<Indicators />} />
-        <Route path="projects/:id/risks" element={<Risks />} />
-        <Route path="projects/:id/documents" element={<Documents />} />
-        <Route path="projects/:id/agents" element={<AIAgents />} />
-        <Route path="projects/:id/outputs" element={<Outputs />} />
+        <Route path="projects/:id" element={<ProjectDetail />}>
+          <Route index element={null} />
+          <Route path="activities" element={<Activities />} />
+          <Route path="indicators" element={<Indicators />} />
+          <Route path="risks" element={<Risks />} />
+          <Route path="documents" element={<Documents />} />
+          <Route path="agents" element={<AIAgents />} />
+          <Route path="outputs" element={<Outputs />} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
