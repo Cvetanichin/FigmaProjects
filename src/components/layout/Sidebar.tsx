@@ -1,4 +1,4 @@
-import { NavLink, useParams, useLocation } from 'react-router'
+import { NavLink, useLocation } from 'react-router'
 import {
   LayoutDashboard, FolderKanban, Activity, Target,
   AlertTriangle, FileText, Bot, FileOutput, LogOut, ChevronLeft
@@ -23,8 +23,9 @@ const projectNav = [
 
 export function Sidebar() {
   const { signOut } = useAuth()
-  const { id } = useParams()
   const location = useLocation()
+  const projectMatch = location.pathname.match(/^\/projects\/([^/]+)/)
+  const id = projectMatch?.[1]
   const inProject = Boolean(id)
 
   return (

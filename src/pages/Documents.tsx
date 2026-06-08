@@ -78,9 +78,17 @@ export function Documents() {
 
   const handleDelete = async (doc: ProjectDocument) => {
     if (doc.file_path) {
-      await supabase.storage.from('documents').remove([doc.file_path])
+      const { error: storageError } = await supabase.storage.from('documents').remove([doc.file_path])
+      if (storageError) {
+        toast.error('Failed to delete file from storage')
+        return
+      }
     }
-    await supabase.from('project_documents').delete().eq('id', doc.id)
+    const { error: dbError } = await supabase.from('project_documents').delete().eq('id', doc.id)
+    if (dbError) {
+      toast.error('Failed to remove document record')
+      return
+    }
     toast.success('Document removed')
     load()
   }

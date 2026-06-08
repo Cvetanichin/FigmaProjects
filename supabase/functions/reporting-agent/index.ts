@@ -21,7 +21,11 @@ Deno.serve(async (req) => {
   const [{ data: project }, { data: indicators }, { data: activities }, { data: risks }, { data: docs }] = await Promise.all([
     supabase.from('projects').select('*').eq('id', project_id).single(),
     supabase.from('indicators').select('*').eq('project_id', project_id),
-    supabase.from('activities').select('*').eq('project_id', project_id),
+    // Activities that overlap with the reporting period:
+    // started before period ends AND (ended after period starts OR end_date is null)
+    supabase.from('activities').select('*').eq('project_id', project_id)
+      .or(`end_date.is.null,end_date.gte.${period_start}`)
+      .or(`start_date.is.null,start_date.lte.${period_end}`),
     supabase.from('risks').select('*').eq('project_id', project_id).eq('status', 'open'),
     supabase.from('project_documents').select('name, category').eq('project_id', project_id),
   ])
