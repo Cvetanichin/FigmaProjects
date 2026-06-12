@@ -1,5 +1,24 @@
+import { Component, type ReactNode } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router'
 import { AuthProvider, useAuth } from '../contexts/AuthContext'
+
+class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state = { error: null }
+  static getDerivedStateFromError(error: Error) { return { error } }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center p-6">
+          <div className="max-w-md w-full bg-card border border-destructive/50 rounded-xl p-6">
+            <h1 className="text-base font-semibold text-destructive mb-2">Application Error</h1>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{(this.state.error as Error).message}</p>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 import { AppLayout } from '../components/layout/AppLayout'
 import { Login } from '../pages/Login'
 import { Dashboard } from '../pages/Dashboard'
@@ -56,10 +75,12 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
