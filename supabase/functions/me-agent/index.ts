@@ -35,7 +35,8 @@ Deno.serve(async (req) => {
     triggered_by: user_id ?? null,
   }).select().single()
 
-  const prompt = `You are an M&E (Monitoring & Evaluation) analyst for a CSO project. Produce a concise monthly M&E intelligence brief.
+  try {
+    const prompt = `You are an M&E (Monitoring & Evaluation) analyst for a CSO project. Produce a concise monthly M&E intelligence brief.
 
 PROJECT: ${project?.name ?? 'Unknown'}
 PERIOD: ${period_start} to ${period_end}
@@ -66,33 +67,44 @@ Write a structured M&E brief in markdown with these sections:
 
 Be specific, professional, and evidence-based. Flag concrete issues. Keep it under 600 words.`
 
-  const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! })
-  const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1500,
-    messages: [{ role: 'user', content: prompt }],
-  })
+    const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! })
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1500,
+      messages: [{ role: 'user', content: prompt }],
+    })
 
-  const content = message.content[0].type === 'text' ? message.content[0].text : ''
-  const title = `M&E Brief — ${project?.name ?? 'Project'} (${period_start} to ${period_end})`
+    const content = message.content[0].type === 'text' ? message.content[0].text : ''
+    const title = `M&E Brief — ${project?.name ?? 'Project'} (${period_start} to ${period_end})`
 
-  const { data: reportRow } = await supabase.from('reports').insert({
-    project_id,
-    title,
-    report_type: 'me_brief',
-    content,
-    generated_by: user_id ?? null,
-    period_start,
-    period_end,
-  }).select().single()
+    const { data: reportRow } = await supabase.from('reports').insert({
+      project_id,
+      title,
+      report_type: 'me_brief',
+      content,
+      generated_by: user_id ?? null,
+      period_start,
+      period_end,
+    }).select().single()
 
-  await supabase.from('agent_runs').update({
-    status: 'completed',
-    output_data: { title },
-    report_id: reportRow?.id ?? null,
-  }).eq('id', runRow?.id)
+    await supabase.from('agent_runs').update({
+      status: 'completed',
+      output_data: { title },
+      report_id: reportRow?.id ?? null,
+    }).eq('id', runRow?.id)
 
-  return new Response(JSON.stringify({ success: true, report_id: reportRow?.id, content }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  })
+    return new Response(JSON.stringify({ success: true, report_id: reportRow?.id, content }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    await supabase.from('agent_runs').update({
+      status: 'error',
+      error_message: message,
+    }).eq('id', runRow?.id)
+    return new Response(JSON.stringify({ success: false, error: message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
 })

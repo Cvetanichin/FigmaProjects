@@ -35,10 +35,11 @@ Deno.serve(async (req) => {
     triggered_by: user_id ?? null,
   }).select().single()
 
-  const docList = (docs ?? []).map(d => `- ${d.name} [${d.category ?? 'uncategorised'}]`).join('\n')
-  const riskList = (risks ?? []).map(r => `- ${r.title} [${r.category ?? 'general'}, ${r.risk_level ?? '?'} risk, ${r.status}]`).join('\n')
+  try {
+    const docList = (docs ?? []).map(d => `- ${d.name} [${d.category ?? 'uncategorised'}]`).join('\n')
+    const riskList = (risks ?? []).map(r => `- ${r.title} [${r.category ?? 'general'}, ${r.risk_level ?? '?'} risk, ${r.status}]`).join('\n')
 
-  const prompt = `You are a compliance analyst reviewing a CSO/NGO project for donor compliance and organisational risk.
+    const prompt = `You are a compliance analyst reviewing a CSO/NGO project for donor compliance and organisational risk.
 
 PROJECT: ${project?.name ?? 'Unknown'}
 DONOR: ${project?.donor ?? 'Not specified'}
@@ -68,33 +69,44 @@ Produce a structured compliance review in markdown with these sections:
 
 Rate overall compliance: GREEN / AMBER / RED with justification. Be direct and specific.`
 
-  const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! })
-  const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1500,
-    messages: [{ role: 'user', content: prompt }],
-  })
+    const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! })
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1500,
+      messages: [{ role: 'user', content: prompt }],
+    })
 
-  const content = message.content[0].type === 'text' ? message.content[0].text : ''
-  const title = `Compliance Review — ${project?.name ?? 'Project'} (${period_start} to ${period_end})`
+    const content = message.content[0].type === 'text' ? message.content[0].text : ''
+    const title = `Compliance Review — ${project?.name ?? 'Project'} (${period_start} to ${period_end})`
 
-  const { data: reportRow } = await supabase.from('reports').insert({
-    project_id,
-    title,
-    report_type: 'compliance_review',
-    content,
-    generated_by: user_id ?? null,
-    period_start,
-    period_end,
-  }).select().single()
+    const { data: reportRow } = await supabase.from('reports').insert({
+      project_id,
+      title,
+      report_type: 'compliance_review',
+      content,
+      generated_by: user_id ?? null,
+      period_start,
+      period_end,
+    }).select().single()
 
-  await supabase.from('agent_runs').update({
-    status: 'completed',
-    output_data: { title },
-    report_id: reportRow?.id ?? null,
-  }).eq('id', runRow?.id)
+    await supabase.from('agent_runs').update({
+      status: 'completed',
+      output_data: { title },
+      report_id: reportRow?.id ?? null,
+    }).eq('id', runRow?.id)
 
-  return new Response(JSON.stringify({ success: true, report_id: reportRow?.id, content }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  })
+    return new Response(JSON.stringify({ success: true, report_id: reportRow?.id, content }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    await supabase.from('agent_runs').update({
+      status: 'error',
+      error_message: message,
+    }).eq('id', runRow?.id)
+    return new Response(JSON.stringify({ success: false, error: message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
 })
