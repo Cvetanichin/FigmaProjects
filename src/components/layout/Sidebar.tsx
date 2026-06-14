@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router'
 import {
   LayoutDashboard, FolderKanban, Activity, Target,
-  AlertTriangle, FileText, Bot, FileOutput, LogOut, ChevronLeft
+  AlertTriangle, FileText, Bot, FileOutput, LogOut, ChevronLeft, Scale
 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { cn } from '../../lib/utils'
@@ -9,6 +9,7 @@ import { cn } from '../../lib/utils'
 const topNav = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/projects', icon: FolderKanban, label: 'Projects' },
+  { to: '/civil-society', icon: Scale, label: 'Civil Society OS' },
 ]
 
 const projectNav = [
