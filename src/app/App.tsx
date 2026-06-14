@@ -30,6 +30,7 @@ import { Activities } from '../pages/Activities'
 import { Documents } from '../pages/Documents'
 import { AIAgents } from '../pages/AIAgents'
 import { Outputs } from '../pages/Outputs'
+import { CivilSocietyOS } from '../pages/CivilSocietyOS'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, loading } = useAuth()
@@ -67,6 +68,7 @@ function AppRoutes() {
           <Route path="agents" element={<AIAgents />} />
           <Route path="outputs" element={<Outputs />} />
         </Route>
+        <Route path="civil-society" element={<CivilSocietyOS />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
