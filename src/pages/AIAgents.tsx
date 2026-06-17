@@ -4,6 +4,7 @@ import { Bot, Play, Clock, CheckCircle, XCircle, Loader } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { AIAgent, AgentRun } from '../lib/types'
 import { useAuth } from '../contexts/AuthContext'
+import { UpgradeModal } from '../components/UpgradeModal'
 import { toast } from 'sonner'
 
 const AGENT_ICONS: Record<string, string> = {
@@ -27,10 +28,11 @@ function StatusIcon({ status }: { status: string }) {
 
 export function AIAgents() {
   const { id: projectId } = useParams<{ id: string }>()
-  const { user } = useAuth()
+  const { user, canRunAgent, refreshProfile } = useAuth()
   const [agents, setAgents] = useState<AIAgent[]>([])
   const [runs, setRuns] = useState<AgentRun[]>([])
   const [running, setRunning] = useState<Record<string, boolean>>({})
+  const [showUpgrade, setShowUpgrade] = useState(false)
   const [periodStart, setPeriodStart] = useState(() => {
     const d = new Date()
     d.setDate(1)
@@ -50,12 +52,19 @@ export function AIAgents() {
   useEffect(() => { load() }, [projectId])
 
   const runAgent = async (agent: AIAgent) => {
+    if (!canRunAgent()) {
+      setShowUpgrade(true)
+      return
+    }
     setRunning(r => ({ ...r, [agent.id]: true }))
     try {
       const { data, error } = await supabase.functions.invoke(agent.edge_function, {
         body: { project_id: projectId, period_start: periodStart, period_end: periodEnd, user_id: user?.id },
       })
       if (error) throw error
+      const { data: prof } = await supabase.from('profiles').select('ai_runs_used').eq('id', user!.id).single()
+      await supabase.from('profiles').update({ ai_runs_used: (prof?.ai_runs_used ?? 0) + 1 }).eq('id', user!.id)
+      await refreshProfile()
       toast.success(`${agent.name} completed`)
       load()
     } catch (err: unknown) {
@@ -68,6 +77,8 @@ export function AIAgents() {
   const field = 'px-2 py-1.5 bg-input-background border border-border rounded-md text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring'
 
   return (
+    <>
+    {showUpgrade && <UpgradeModal feature="AI agent runs" onClose={() => setShowUpgrade(false)} />}
     <div className="p-6">
       <div className="mb-5">
         <h2 className="text-base font-medium text-foreground">AI Agents</h2>
@@ -146,5 +157,6 @@ export function AIAgents() {
         </div>
       )}
     </div>
+    </>
   )
 }

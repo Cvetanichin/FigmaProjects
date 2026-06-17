@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router'
-import { FileOutput, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
+import { useParams, Link } from 'react-router'
+import { FileOutput, ChevronDown, ChevronUp, Trash2, Lock } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Report } from '../lib/types'
 import { toast } from 'sonner'
 import ReactMarkdown from 'react-markdown'
+import { useAuth } from '../contexts/AuthContext'
+import { PLAN_LIMITS } from '../lib/stripe'
 
 const TYPE_COLOR: Record<string, string> = {
   me_brief: 'bg-blue-400/10 text-blue-400',
@@ -20,6 +22,8 @@ const TYPE_LABEL: Record<string, string> = {
 
 export function Outputs() {
   const { id: projectId } = useParams<{ id: string }>()
+  const { profile } = useAuth()
+  const reportLimit = PLAN_LIMITS[profile.plan].reports
   const [reports, setReports] = useState<Report[]>([])
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -55,8 +59,17 @@ export function Outputs() {
         </div>
       ) : (
         <div className="space-y-3">
-          {reports.map(report => (
-            <div key={report.id} className="bg-card border border-border rounded-xl overflow-hidden">
+          {reports.map((report, idx) => {
+            const locked = reportLimit !== Infinity && idx >= reportLimit
+            return (
+            <div key={report.id} className={`bg-card border border-border rounded-xl overflow-hidden relative ${locked ? 'opacity-60' : ''}`}>
+            {locked && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-card/80 backdrop-blur-sm rounded-xl gap-2">
+                <Lock className="w-5 h-5 text-muted-foreground" />
+                <p className="text-xs text-muted-foreground">Upgrade to view older reports</p>
+                <Link to="/billing" className="text-xs text-primary hover:underline">See plans →</Link>
+              </div>
+            )}
               <div
                 className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-accent/30 transition-colors"
                 onClick={() => setExpanded(expanded === report.id ? null : report.id)}
@@ -93,7 +106,8 @@ export function Outputs() {
                 </div>
               )}
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
