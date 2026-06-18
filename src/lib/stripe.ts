@@ -1,20 +1,22 @@
 import { supabase } from './supabase'
 
-export type Plan = 'free' | 'pro' | 'team'
+export type Plan = 'free' | 'starter' | 'professional' | 'organisation'
 
 export const PLAN_LIMITS: Record<Plan, { projects: number; aiRuns: number; reports: number }> = {
-  free: { projects: 2, aiRuns: 5, reports: 5 },
-  pro:  { projects: Infinity, aiRuns: 50, reports: Infinity },
-  team: { projects: Infinity, aiRuns: 200, reports: Infinity },
+  free:         { projects: 2,        aiRuns: 5,   reports: 5 },
+  starter:      { projects: 5,        aiRuns: 20,  reports: 20 },
+  professional: { projects: 15,       aiRuns: 60,  reports: Infinity },
+  organisation: { projects: Infinity, aiRuns: 200, reports: Infinity },
 }
 
 export const PLAN_LABELS: Record<Plan, string> = {
-  free: 'Free',
-  pro: 'Pro',
-  team: 'Team',
+  free:         'Free',
+  starter:      'Starter',
+  professional: 'Professional',
+  organisation: 'Organisation',
 }
 
-export async function redirectToCheckout(plan: 'pro' | 'team') {
+export async function redirectToCheckout(plan: Exclude<Plan, 'free'>) {
   const { data: { session } } = await supabase.auth.getSession()
   const { data, error } = await supabase.functions.invoke('create-checkout-session', {
     body: { plan },

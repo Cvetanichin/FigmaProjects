@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Zap } from 'lucide-react'
-import { redirectToCheckout } from '../lib/stripe'
+import { redirectToCheckout, type Plan } from '../lib/stripe'
 import { toast } from 'sonner'
 
 interface Props {
@@ -8,10 +8,12 @@ interface Props {
   onClose: () => void
 }
 
-export function UpgradeModal({ feature, onClose }: Props) {
-  const [loading, setLoading] = useState<'pro' | 'team' | null>(null)
+type PaidPlan = Exclude<Plan, 'free'>
 
-  const upgrade = async (plan: 'pro' | 'team') => {
+export function UpgradeModal({ feature, onClose }: Props) {
+  const [loading, setLoading] = useState<PaidPlan | null>(null)
+
+  const upgrade = async (plan: PaidPlan) => {
     setLoading(plan)
     try {
       await redirectToCheckout(plan)
@@ -23,7 +25,7 @@ export function UpgradeModal({ feature, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-card border border-border rounded-xl w-full max-w-md shadow-xl">
+      <div className="bg-card border border-border rounded-xl w-full max-w-lg shadow-xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-primary" />
@@ -40,45 +42,68 @@ export function UpgradeModal({ feature, onClose }: Props) {
           </p>
 
           <div className="space-y-3">
+            {/* Starter */}
             <div className="border border-primary/40 rounded-lg p-4 bg-primary/5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-foreground">Pro</span>
-                <span className="text-sm font-bold text-foreground">€29<span className="text-xs font-normal text-muted-foreground">/mo</span></span>
+                <span className="text-sm font-semibold text-foreground">Starter</span>
+                <span className="text-sm font-bold text-foreground">€69<span className="text-xs font-normal text-muted-foreground">/mo</span></span>
               </div>
               <ul className="text-xs text-muted-foreground space-y-1 mb-4">
-                <li>✓ Unlimited projects</li>
-                <li>✓ 50 AI agent runs/month</li>
-                <li>✓ 5 GB document storage</li>
-                <li>✓ Unlimited saved reports</li>
-                <li>✓ PDF & Word export</li>
+                <li>✓ 5 projects</li>
+                <li>✓ 20 AI agent runs/month</li>
+                <li>✓ 2 GB document storage</li>
+                <li>✓ 20 saved reports</li>
               </ul>
               <button
-                onClick={() => upgrade('pro')}
+                onClick={() => upgrade('starter')}
                 disabled={loading !== null}
                 className="w-full py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
               >
-                {loading === 'pro' ? 'Redirecting…' : 'Upgrade to Pro'}
+                {loading === 'starter' ? 'Redirecting…' : 'Upgrade to Starter'}
               </button>
             </div>
 
+            {/* Professional */}
             <div className="border border-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-foreground">Team</span>
-                <span className="text-sm font-bold text-foreground">€79<span className="text-xs font-normal text-muted-foreground">/mo</span></span>
+                <span className="text-sm font-semibold text-foreground">Professional</span>
+                <span className="text-sm font-bold text-foreground">€149<span className="text-xs font-normal text-muted-foreground">/mo</span></span>
               </div>
               <ul className="text-xs text-muted-foreground space-y-1 mb-4">
-                <li>✓ Everything in Pro</li>
-                <li>✓ 200 AI agent runs/month</li>
-                <li>✓ 20 GB document storage</li>
-                <li>✓ Up to 5 team seats</li>
-                <li>✓ Priority support</li>
+                <li>✓ 15 projects</li>
+                <li>✓ 60 AI agent runs/month</li>
+                <li>✓ 10 GB document storage</li>
+                <li>✓ Unlimited reports + PDF/Word export</li>
+                <li>✓ Up to 3 users</li>
               </ul>
               <button
-                onClick={() => upgrade('team')}
+                onClick={() => upgrade('professional')}
                 disabled={loading !== null}
                 className="w-full py-2 border border-border text-foreground rounded-md text-sm font-medium hover:bg-accent transition-colors disabled:opacity-50"
               >
-                {loading === 'team' ? 'Redirecting…' : 'Upgrade to Team'}
+                {loading === 'professional' ? 'Redirecting…' : 'Upgrade to Professional'}
+              </button>
+            </div>
+
+            {/* Organisation */}
+            <div className="border border-border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-foreground">Organisation</span>
+                <span className="text-sm font-bold text-foreground">€299<span className="text-xs font-normal text-muted-foreground">/mo</span></span>
+              </div>
+              <ul className="text-xs text-muted-foreground space-y-1 mb-4">
+                <li>✓ Unlimited projects</li>
+                <li>✓ 200 AI agent runs/month</li>
+                <li>✓ 50 GB storage + PDF/Word export</li>
+                <li>✓ Up to 10 users</li>
+                <li>✓ Priority support</li>
+              </ul>
+              <button
+                onClick={() => upgrade('organisation')}
+                disabled={loading !== null}
+                className="w-full py-2 border border-border text-foreground rounded-md text-sm font-medium hover:bg-accent transition-colors disabled:opacity-50"
+              >
+                {loading === 'organisation' ? 'Redirecting…' : 'Upgrade to Organisation'}
               </button>
             </div>
           </div>
