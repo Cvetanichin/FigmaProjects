@@ -50,7 +50,7 @@ export function UpgradeModal({ feature, onClose }: Props) {
               </div>
               <ul className="text-xs text-muted-foreground space-y-1 mb-4">
                 <li>✓ 5 projects</li>
-                <li>✓ 20 AI agent runs/month</li>
+                <li>✓ 15 AI agent runs/month</li>
                 <li>✓ 2 GB document storage</li>
                 <li>✓ 20 saved reports</li>
               </ul>
@@ -71,7 +71,7 @@ export function UpgradeModal({ feature, onClose }: Props) {
               </div>
               <ul className="text-xs text-muted-foreground space-y-1 mb-4">
                 <li>✓ 15 projects</li>
-                <li>✓ 60 AI agent runs/month</li>
+                <li>✓ 45 AI agent runs/month</li>
                 <li>✓ 10 GB document storage</li>
                 <li>✓ Unlimited reports + PDF/Word export</li>
                 <li>✓ Up to 3 users</li>
@@ -93,9 +93,9 @@ export function UpgradeModal({ feature, onClose }: Props) {
               </div>
               <ul className="text-xs text-muted-foreground space-y-1 mb-4">
                 <li>✓ Unlimited projects</li>
-                <li>✓ 200 AI agent runs/month</li>
+                <li>✓ 100 AI agent runs/month</li>
                 <li>✓ 50 GB storage + PDF/Word export</li>
-                <li>✓ Up to 10 users</li>
+                <li>✓ Up to 7 users</li>
                 <li>✓ Priority support</li>
               </ul>
               <button

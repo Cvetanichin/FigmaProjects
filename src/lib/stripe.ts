@@ -2,11 +2,11 @@ import { supabase } from './supabase'
 
 export type Plan = 'free' | 'starter' | 'professional' | 'organisation'
 
-export const PLAN_LIMITS: Record<Plan, { projects: number; aiRuns: number; reports: number }> = {
-  free:         { projects: 2,        aiRuns: 5,   reports: 5 },
-  starter:      { projects: 5,        aiRuns: 20,  reports: 20 },
-  professional: { projects: 15,       aiRuns: 60,  reports: Infinity },
-  organisation: { projects: Infinity, aiRuns: 200, reports: Infinity },
+export const PLAN_LIMITS: Record<Plan, { projects: number; aiRuns: number; reports: number; seats: number }> = {
+  free:         { projects: 2,        aiRuns: 5,   reports: 5,         seats: 1 },
+  starter:      { projects: 5,        aiRuns: 15,  reports: 20,        seats: 1 },
+  professional: { projects: 15,       aiRuns: 45,  reports: Infinity,  seats: 3 },
+  organisation: { projects: Infinity, aiRuns: 100, reports: Infinity,  seats: 7 },
 }
 
 export const PLAN_LABELS: Record<Plan, string> = {

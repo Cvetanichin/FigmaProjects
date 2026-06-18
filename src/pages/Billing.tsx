@@ -45,21 +45,21 @@ const PLAN_PRICE_ANNUAL: Record<Plan, string | null> = {
 const PLAN_FEATURES: Record<Plan, string[]> = {
   free: [
     '2 projects',
-    '5 AI agent runs/mo',
+    '5 AI runs (first month only)',
     '100 MB storage',
     '5 saved reports',
     '1 user',
   ],
   starter: [
     '5 projects',
-    '20 AI agent runs/mo',
+    '15 AI agent runs/mo',
     '2 GB storage',
     '20 saved reports',
     '1 user',
   ],
   professional: [
     '15 projects',
-    '60 AI agent runs/mo',
+    '45 AI agent runs/mo',
     '10 GB storage',
     'Unlimited reports',
     'PDF & Word export',
@@ -67,11 +67,11 @@ const PLAN_FEATURES: Record<Plan, string[]> = {
   ],
   organisation: [
     'Unlimited projects',
-    '200 AI agent runs/mo',
+    '100 AI agent runs/mo',
     '50 GB storage',
     'Unlimited reports',
     'PDF & Word export',
-    'Up to 10 users',
+    'Up to 7 users',
     'Priority support',
   ],
 }
