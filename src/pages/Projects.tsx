@@ -4,6 +4,8 @@ import { Plus, FolderKanban, ArrowRight, CalendarDays, DollarSign } from 'lucide
 import { supabase } from '../lib/supabase'
 import type { Project } from '../lib/types'
 import { ProjectForm } from '../components/projects/ProjectForm'
+import { UpgradeModal } from '../components/UpgradeModal'
+import { useAuth } from '../contexts/AuthContext'
 
 const STATUS_COLORS: Record<string, string> = {
   active: 'bg-green-400/10 text-green-400',
@@ -12,9 +14,11 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export function Projects() {
+  const { canAddProject } = useAuth()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [showUpgrade, setShowUpgrade] = useState(false)
 
   const load = async () => {
     const { data } = await supabase.from('projects').select('*').order('created_at', { ascending: false })
@@ -32,7 +36,7 @@ export function Projects() {
           <p className="text-sm text-muted-foreground mt-0.5">{projects.length} project{projects.length !== 1 ? 's' : ''}</p>
         </div>
         <button
-          onClick={() => setShowForm(true)}
+          onClick={() => canAddProject(projects.length) ? setShowForm(true) : setShowUpgrade(true)}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
         >
           <Plus className="w-4 h-4" />
@@ -117,6 +121,7 @@ export function Projects() {
           onSaved={() => { setShowForm(false); load() }}
         />
       )}
+      {showUpgrade && <UpgradeModal feature="projects" onClose={() => setShowUpgrade(false)} />}
     </div>
   )
 }
