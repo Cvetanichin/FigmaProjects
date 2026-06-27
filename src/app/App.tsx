@@ -1,6 +1,7 @@
 import { Component, type ReactNode } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router'
 import { AuthProvider, useAuth } from '../contexts/AuthContext'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null }
@@ -85,6 +86,7 @@ export default function App() {
           <AppRoutes />
         </BrowserRouter>
       </AuthProvider>
+      <SpeedInsights />
     </ErrorBoundary>
   )
 }
