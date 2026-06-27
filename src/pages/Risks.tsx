@@ -18,12 +18,18 @@ const STATUS_COLOR: Record<string, string> = {
 }
 const CATEGORIES = ['operational', 'financial', 'reputational', 'compliance', 'contextual', 'other']
 const LEVELS = ['low', 'medium', 'high']
-const RISK_LEVELS = ['low', 'medium', 'high', 'critical']
 const STATUSES = ['open', 'mitigated', 'closed']
+
+function calcRiskLevel(likelihood: string, impact: string): string {
+  if (likelihood === 'high' && impact === 'high') return 'critical'
+  if (likelihood === 'high' || impact === 'high') return 'high'
+  if (likelihood === 'medium' && impact === 'medium') return 'medium'
+  return 'low'
+}
 
 const emptyForm = {
   title: '', description: '', category: 'operational', likelihood: 'medium',
-  impact: 'medium', risk_level: 'medium', mitigation: '', owner: '', status: 'open',
+  impact: 'medium', mitigation: '', owner: '', status: 'open',
 }
 
 export function Risks() {
@@ -47,7 +53,7 @@ export function Risks() {
     setForm({
       title: r.title, description: r.description ?? '', category: r.category ?? 'operational',
       likelihood: r.likelihood ?? 'medium', impact: r.impact ?? 'medium',
-      risk_level: r.risk_level ?? 'medium', mitigation: r.mitigation ?? '',
+      mitigation: r.mitigation ?? '',
       owner: r.owner ?? '', status: r.status,
     })
     setEditing(r)
@@ -66,7 +72,7 @@ export function Risks() {
       category: form.category || null,
       likelihood: form.likelihood || null,
       impact: form.impact || null,
-      risk_level: form.risk_level || null,
+      risk_level: calcRiskLevel(form.likelihood, form.impact),
       mitigation: form.mitigation || null,
       owner: form.owner || null,
       status: form.status,
@@ -193,9 +199,11 @@ export function Risks() {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-foreground mb-1.5">Risk level</label>
-                  <select className={field} value={form.risk_level} onChange={set('risk_level')}>
-                    {RISK_LEVELS.map(l => <option key={l} value={l} className="capitalize">{l}</option>)}
-                  </select>
+                  <div className="px-3 py-2 bg-input-background border border-border rounded-md flex items-center">
+                    <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${RISK_LEVEL_COLOR[calcRiskLevel(form.likelihood, form.impact)] ?? 'bg-muted text-muted-foreground'}`}>
+                      {calcRiskLevel(form.likelihood, form.impact)}
+                    </span>
+                  </div>
                 </div>
               </div>
               <div>
