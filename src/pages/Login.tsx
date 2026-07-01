@@ -104,6 +104,8 @@ export function Login() {
           <span>·</span>
           <Link to="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
           <span>·</span>
+          <Link to="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
+          <span>·</span>
           <Link to="/legal/refunds" className="hover:text-foreground transition-colors">Refunds</Link>
           <span>·</span>
           <a href="mailto:cvetanichin@gmail.com" className="hover:text-foreground transition-colors">Contact</a>

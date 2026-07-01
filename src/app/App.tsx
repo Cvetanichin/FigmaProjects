@@ -36,6 +36,7 @@ import { PrivacyPolicy } from '../pages/legal/PrivacyPolicy'
 import { TermsOfService } from '../pages/legal/TermsOfService'
 import { RefundPolicy } from '../pages/legal/RefundPolicy'
 import { ProductInfo } from '../pages/legal/ProductInfo'
+import { Pricing } from '../pages/legal/Pricing'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, loading } = useAuth()
@@ -64,6 +65,7 @@ function AppRoutes() {
       <Route path="/legal/terms" element={<TermsOfService />} />
       <Route path="/legal/refunds" element={<RefundPolicy />} />
       <Route path="/about" element={<ProductInfo />} />
+      <Route path="/pricing" element={<Pricing />} />
       <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
