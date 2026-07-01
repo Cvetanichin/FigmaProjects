@@ -7,8 +7,9 @@ const corsHeaders = {
 }
 
 const PRICE_IDS: Record<string, string> = {
-  pro: Deno.env.get('STRIPE_PRO_PRICE_ID') ?? '',
-  team: Deno.env.get('STRIPE_TEAM_PRICE_ID') ?? '',
+  starter: Deno.env.get('STRIPE_STARTER_PRICE_ID') ?? '',
+  professional: Deno.env.get('STRIPE_PROFESSIONAL_PRICE_ID') ?? '',
+  organisation: Deno.env.get('STRIPE_ORGANISATION_PRICE_ID') ?? '',
 }
 
 Deno.serve(async (req) => {
