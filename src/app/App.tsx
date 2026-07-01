@@ -32,6 +32,10 @@ import { AIAgents } from '../pages/AIAgents'
 import { Outputs } from '../pages/Outputs'
 import { CivilSocietyOS } from '../pages/CivilSocietyOS'
 import { Billing } from '../pages/Billing'
+import { PrivacyPolicy } from '../pages/legal/PrivacyPolicy'
+import { TermsOfService } from '../pages/legal/TermsOfService'
+import { RefundPolicy } from '../pages/legal/RefundPolicy'
+import { ProductInfo } from '../pages/legal/ProductInfo'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, loading } = useAuth()
@@ -56,6 +60,10 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={session ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/legal/privacy" element={<PrivacyPolicy />} />
+      <Route path="/legal/terms" element={<TermsOfService />} />
+      <Route path="/legal/refunds" element={<RefundPolicy />} />
+      <Route path="/about" element={<ProductInfo />} />
       <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />

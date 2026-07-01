@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { Bot } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { toast } from 'sonner'
@@ -40,6 +41,12 @@ export function Login() {
             <p className="text-xs text-muted-foreground">CSO Project Management</p>
           </div>
         </div>
+
+        <p className="text-center text-xs text-muted-foreground mb-6 px-2">
+          AI-enhanced CSO Project Management Software — Project Planning, Progress &amp; Risk Tracking, Budget
+          Planning, and Donor-Compliant Reporting.{' '}
+          <Link to="/about" className="text-primary hover:underline">Learn more</Link>
+        </p>
 
         <div className="bg-card border border-border rounded-xl p-6">
           <h2 className="text-base font-medium text-foreground mb-1">
@@ -90,6 +97,16 @@ export function Login() {
               {isSignUp ? 'Sign in' : 'Sign up'}
             </button>
           </p>
+        </div>
+
+        <div className="flex items-center justify-center gap-3 mt-6 text-xs text-muted-foreground">
+          <Link to="/legal/terms" className="hover:text-foreground transition-colors">Terms</Link>
+          <span>·</span>
+          <Link to="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+          <span>·</span>
+          <Link to="/legal/refunds" className="hover:text-foreground transition-colors">Refunds</Link>
+          <span>·</span>
+          <a href="mailto:cvetanichin@gmail.com" className="hover:text-foreground transition-colors">Contact</a>
         </div>
       </div>
     </div>
