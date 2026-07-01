@@ -30,16 +30,16 @@ const PLAN_ORDER: Plan[] = ['free', 'starter', 'professional', 'organisation']
 
 const PLAN_PRICE_MONTHLY: Record<Plan, string> = {
   free:         '€0',
-  starter:      '€69',
-  professional: '€149',
-  organisation: '€299',
+  starter:      '€49',
+  professional: '€109',
+  organisation: '€169',
 }
 
 const PLAN_PRICE_ANNUAL: Record<Plan, string | null> = {
   free:         null,
-  starter:      '€55/mo billed annually',
-  professional: '€119/mo billed annually',
-  organisation: '€239/mo billed annually',
+  starter:      '€39/mo billed annually',
+  professional: '€99/mo billed annually',
+  organisation: '€159/mo billed annually',
 }
 
 const PLAN_FEATURES: Record<Plan, string[]> = {
@@ -55,15 +55,15 @@ const PLAN_FEATURES: Record<Plan, string[]> = {
     '15 AI agent runs/mo',
     '2 GB storage',
     '20 saved reports',
-    '1 user',
+    'Up to 2 users',
   ],
   professional: [
-    '15 projects',
-    '45 AI agent runs/mo',
+    '10 projects',
+    '50 AI agent runs/mo',
     '10 GB storage',
     'Unlimited reports',
     'PDF & Word export',
-    'Up to 3 users',
+    'Up to 5 users',
   ],
   organisation: [
     'Unlimited projects',

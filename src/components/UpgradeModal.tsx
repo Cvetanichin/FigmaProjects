@@ -46,13 +46,14 @@ export function UpgradeModal({ feature, onClose }: Props) {
             <div className="border border-primary/40 rounded-lg p-4 bg-primary/5">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-semibold text-foreground">Starter</span>
-                <span className="text-sm font-bold text-foreground">€69<span className="text-xs font-normal text-muted-foreground">/mo</span></span>
+                <span className="text-sm font-bold text-foreground">€49<span className="text-xs font-normal text-muted-foreground">/mo</span></span>
               </div>
               <ul className="text-xs text-muted-foreground space-y-1 mb-4">
                 <li>✓ 5 projects</li>
                 <li>✓ 15 AI agent runs/month</li>
                 <li>✓ 2 GB document storage</li>
                 <li>✓ 20 saved reports</li>
+                <li>✓ Up to 2 users</li>
               </ul>
               <button
                 onClick={() => upgrade('starter')}
@@ -67,14 +68,14 @@ export function UpgradeModal({ feature, onClose }: Props) {
             <div className="border border-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-semibold text-foreground">Professional</span>
-                <span className="text-sm font-bold text-foreground">€149<span className="text-xs font-normal text-muted-foreground">/mo</span></span>
+                <span className="text-sm font-bold text-foreground">€109<span className="text-xs font-normal text-muted-foreground">/mo</span></span>
               </div>
               <ul className="text-xs text-muted-foreground space-y-1 mb-4">
-                <li>✓ 15 projects</li>
-                <li>✓ 45 AI agent runs/month</li>
+                <li>✓ 10 projects</li>
+                <li>✓ 50 AI agent runs/month</li>
                 <li>✓ 10 GB document storage</li>
                 <li>✓ Unlimited reports + PDF/Word export</li>
-                <li>✓ Up to 3 users</li>
+                <li>✓ Up to 5 users</li>
               </ul>
               <button
                 onClick={() => upgrade('professional')}
@@ -89,7 +90,7 @@ export function UpgradeModal({ feature, onClose }: Props) {
             <div className="border border-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-semibold text-foreground">Organisation</span>
-                <span className="text-sm font-bold text-foreground">€299<span className="text-xs font-normal text-muted-foreground">/mo</span></span>
+                <span className="text-sm font-bold text-foreground">€169<span className="text-xs font-normal text-muted-foreground">/mo</span></span>
               </div>
               <ul className="text-xs text-muted-foreground space-y-1 mb-4">
                 <li>✓ Unlimited projects</li>

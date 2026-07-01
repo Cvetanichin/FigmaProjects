@@ -4,8 +4,8 @@ export type Plan = 'free' | 'starter' | 'professional' | 'organisation'
 
 export const PLAN_LIMITS: Record<Plan, { projects: number; aiRuns: number; reports: number; seats: number }> = {
   free:         { projects: 2,        aiRuns: 5,   reports: 5,         seats: 1 },
-  starter:      { projects: 5,        aiRuns: 15,  reports: 20,        seats: 1 },
-  professional: { projects: 15,       aiRuns: 45,  reports: Infinity,  seats: 3 },
+  starter:      { projects: 5,        aiRuns: 15,  reports: 20,        seats: 2 },
+  professional: { projects: 10,       aiRuns: 50,  reports: Infinity,  seats: 5 },
   organisation: { projects: Infinity, aiRuns: 100, reports: Infinity,  seats: 7 },
 }
 
