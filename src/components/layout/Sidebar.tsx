@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router'
 import {
   LayoutDashboard, FolderKanban, Activity, Target,
-  AlertTriangle, FileText, Bot, FileOutput, LogOut, ChevronLeft, Scale, CreditCard
+  AlertTriangle, FileText, Bot, FileOutput, LogOut, ChevronLeft, Scale, CreditCard, UserCircle
 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { cn } from '../../lib/utils'
@@ -112,6 +112,19 @@ export function Sidebar() {
         >
           <CreditCard className="w-4 h-4 flex-shrink-0" />
           Billing
+        </NavLink>
+        <NavLink
+          to="/account"
+          className={({ isActive }) =>
+            cn('flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors',
+              isActive
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+            )
+          }
+        >
+          <UserCircle className="w-4 h-4 flex-shrink-0" />
+          Account
         </NavLink>
         <button
           onClick={signOut}

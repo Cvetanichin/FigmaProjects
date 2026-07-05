@@ -1,6 +1,6 @@
 import { Link } from 'react-router'
 import { Bot, ArrowLeft, Check } from 'lucide-react'
-import { PLAN_LABELS, type Plan } from '../../lib/stripe'
+import { PLAN_LABELS, type Plan } from '../../lib/paddle'
 
 const PLAN_ORDER: Plan[] = ['free', 'starter', 'professional', 'organisation']
 

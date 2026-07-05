@@ -54,7 +54,7 @@ export function ProductInfo() {
       </LegalSection>
 
       <LegalSection title="Trust & Compliance">
-        <LegalList items={['Secure payment processing through Stripe', 'Transparent pricing', 'Privacy-first approach', 'Clear licensing terms', 'Dedicated customer support']} />
+        <LegalList items={['Secure payment processing through Paddle', 'Transparent pricing', 'Privacy-first approach', 'Clear licensing terms', 'Dedicated customer support']} />
       </LegalSection>
 
       <LegalSection title="Contact">

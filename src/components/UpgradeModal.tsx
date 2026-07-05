@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Zap } from 'lucide-react'
-import { redirectToCheckout, type Plan } from '../lib/stripe'
+import { openCheckout, type Plan } from '../lib/paddle'
 import { toast } from 'sonner'
 
 interface Props {
@@ -16,9 +16,10 @@ export function UpgradeModal({ feature, onClose }: Props) {
   const upgrade = async (plan: PaidPlan) => {
     setLoading(plan)
     try {
-      await redirectToCheckout(plan)
+      await openCheckout(plan)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to start upgrade')
+    } finally {
       setLoading(null)
     }
   }
@@ -60,7 +61,7 @@ export function UpgradeModal({ feature, onClose }: Props) {
                 disabled={loading !== null}
                 className="w-full py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
               >
-                {loading === 'starter' ? 'Redirecting…' : 'Upgrade to Starter'}
+                {loading === 'starter' ? 'Opening checkout…' : 'Upgrade to Starter'}
               </button>
             </div>
 
@@ -82,7 +83,7 @@ export function UpgradeModal({ feature, onClose }: Props) {
                 disabled={loading !== null}
                 className="w-full py-2 border border-border text-foreground rounded-md text-sm font-medium hover:bg-accent transition-colors disabled:opacity-50"
               >
-                {loading === 'professional' ? 'Redirecting…' : 'Upgrade to Professional'}
+                {loading === 'professional' ? 'Opening checkout…' : 'Upgrade to Professional'}
               </button>
             </div>
 
@@ -104,7 +105,7 @@ export function UpgradeModal({ feature, onClose }: Props) {
                 disabled={loading !== null}
                 className="w-full py-2 border border-border text-foreground rounded-md text-sm font-medium hover:bg-accent transition-colors disabled:opacity-50"
               >
-                {loading === 'organisation' ? 'Redirecting…' : 'Upgrade to Organisation'}
+                {loading === 'organisation' ? 'Opening checkout…' : 'Upgrade to Organisation'}
               </button>
             </div>
           </div>

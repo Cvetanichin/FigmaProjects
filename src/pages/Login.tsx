@@ -9,10 +9,12 @@ export function Login() {
   const [password, setPassword] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setUnconfirmedEmail(null)
     try {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({ email, password })
@@ -20,10 +22,29 @@ export function Login() {
         toast.success('Account created. Check your email to confirm.')
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
-        if (error) throw error
+        if (error) {
+          if (error.message.toLowerCase().includes('email not confirmed')) {
+            setUnconfirmedEmail(email)
+          }
+          throw error
+        }
       }
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Authentication failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleResendConfirmation = async () => {
+    if (!unconfirmedEmail) return
+    setLoading(true)
+    try {
+      const { error } = await supabase.auth.resend({ type: 'signup', email: unconfirmedEmail })
+      if (error) throw error
+      toast.success('Confirmation email sent')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to resend confirmation email')
     } finally {
       setLoading(false)
     }
@@ -69,7 +90,14 @@ export function Login() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-foreground mb-1.5">Password</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-medium text-foreground">Password</label>
+                {!isSignUp && (
+                  <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                    Forgot password?
+                  </Link>
+                )}
+              </div>
               <input
                 type="password"
                 value={password}
@@ -79,6 +107,16 @@ export function Login() {
                 className="w-full px-3 py-2 bg-input-background border border-border rounded-md text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
+
+            {unconfirmedEmail && (
+              <div className="text-xs bg-amber-500/10 text-amber-600 border border-amber-500/30 rounded-md p-2.5">
+                Your email isn't confirmed yet.{' '}
+                <button type="button" onClick={handleResendConfirmation} className="underline hover:no-underline">
+                  Resend confirmation email
+                </button>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}

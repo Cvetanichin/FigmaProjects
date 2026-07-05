@@ -6,7 +6,7 @@ import type { Report } from '../lib/types'
 import { toast } from 'sonner'
 import ReactMarkdown from 'react-markdown'
 import { useAuth } from '../contexts/AuthContext'
-import { PLAN_LIMITS } from '../lib/stripe'
+import { PLAN_LIMITS } from '../lib/paddle'
 
 const TYPE_COLOR: Record<string, string> = {
   me_brief: 'bg-blue-400/10 text-blue-400',

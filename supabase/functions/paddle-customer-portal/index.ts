@@ -1,10 +1,13 @@
-import Stripe from 'npm:stripe@14'
 import { createClient } from 'npm:@supabase/supabase-js'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
+
+const PADDLE_API_BASE = (Deno.env.get('PADDLE_ENV') ?? 'production') === 'sandbox'
+  ? 'https://sandbox-api.paddle.com'
+  : 'https://api.paddle.com'
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
@@ -20,18 +23,29 @@ Deno.serve(async (req) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
-    const { data: profile } = await supabase.from('profiles').select('stripe_customer_id').eq('id', user.id).single()
-    if (!profile?.stripe_customer_id) {
-      return new Response(JSON.stringify({ error: 'No Stripe customer found' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    const { data: profile } = await supabase.from('profiles').select('paddle_customer_id').eq('id', user.id).single()
+    if (!profile?.paddle_customer_id) {
+      return new Response(JSON.stringify({ error: 'No active subscription found' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, { apiVersion: '2024-06-20' })
-    const portalSession = await stripe.billingPortal.sessions.create({
-      customer: profile.stripe_customer_id,
-      return_url: `${req.headers.get('origin')}/billing`,
+    const response = await fetch(`${PADDLE_API_BASE}/customers/${profile.paddle_customer_id}/portal-sessions`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${Deno.env.get('PADDLE_API_KEY')!}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({}),
     })
 
-    return new Response(JSON.stringify({ url: portalSession.url }), {
+    if (!response.ok) {
+      const errText = await response.text()
+      throw new Error(`Paddle API error: ${errText}`)
+    }
+
+    const result = await response.json()
+    const url = result.data?.urls?.general?.overview
+
+    return new Response(JSON.stringify({ url }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (err) {

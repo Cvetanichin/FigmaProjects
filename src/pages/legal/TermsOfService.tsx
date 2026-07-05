@@ -35,8 +35,8 @@ export function TermsOfService() {
       </LegalSection>
 
       <LegalSection title="7. Payments">
-        <p>Payments are securely processed through Stripe.</p>
-        <p>Pricing, taxes, subscriptions, renewals, and payment processing are managed through Stripe.</p>
+        <p>Payments are processed through Paddle as Merchant of Record.</p>
+        <p>Pricing, taxes, subscriptions, renewals, and payment processing are managed through Paddle.</p>
       </LegalSection>
 
       <LegalSection title="8. Service Availability">
