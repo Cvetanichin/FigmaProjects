@@ -21,6 +21,9 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
 }
 import { AppLayout } from '../components/layout/AppLayout'
 import { Login } from '../pages/Login'
+import { ForgotPassword } from '../pages/ForgotPassword'
+import { ResetPassword } from '../pages/ResetPassword'
+import { Account } from '../pages/Account'
 import { Dashboard } from '../pages/Dashboard'
 import { Projects } from '../pages/Projects'
 import { ProjectDetail } from '../pages/ProjectDetail'
@@ -61,6 +64,8 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={session ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/forgot-password" element={session ? <Navigate to="/dashboard" replace /> : <ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/legal/privacy" element={<PrivacyPolicy />} />
       <Route path="/legal/terms" element={<TermsOfService />} />
       <Route path="/legal/refunds" element={<RefundPolicy />} />
@@ -81,6 +86,7 @@ function AppRoutes() {
         </Route>
         <Route path="civil-society" element={<CivilSocietyOS />} />
         <Route path="billing" element={<Billing />} />
+        <Route path="account" element={<Account />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
