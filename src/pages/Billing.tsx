@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router'
 import { CreditCard, Bot } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import { redirectToCheckout, redirectToBillingPortal, PLAN_LABELS, PLAN_LIMITS, type Plan } from '../lib/stripe'
+import { openCheckout, redirectToBillingPortal, PLAN_LABELS, PLAN_LIMITS, type Plan } from '../lib/paddle'
 import { toast } from 'sonner'
 
 function UsageBar({ used, limit, label }: { used: number; limit: number; label: string }) {
@@ -96,9 +96,10 @@ export function Billing() {
   const handleUpgrade = async (plan: Exclude<Plan, 'free'>) => {
     setUpgrading(plan)
     try {
-      await redirectToCheckout(plan)
+      await openCheckout(plan)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to start upgrade')
+    } finally {
       setUpgrading(null)
     }
   }
@@ -189,7 +190,7 @@ export function Billing() {
                   disabled={upgrading !== null}
                   className="w-full py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
-                  {upgrading === plan ? 'Redirecting…' : `Upgrade`}
+                  {upgrading === plan ? 'Opening checkout…' : `Upgrade`}
                 </button>
               )}
               {isCurrent && plan === 'free' && (

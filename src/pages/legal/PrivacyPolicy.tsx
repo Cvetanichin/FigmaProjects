@@ -37,8 +37,8 @@ export function PrivacyPolicy() {
       </LegalSection>
 
       <LegalSection title="4. Payments">
-        <p>Payments are securely processed by Stripe, our third-party payment processor.</p>
-        <p>Stripe is responsible for payment processing, billing, and transaction management. Stripe's own privacy practices may also apply to payment data — see Stripe's privacy policy for details.</p>
+        <p>Payments are processed by Paddle, our Merchant of Record.</p>
+        <p>Paddle is responsible for payment processing, billing, tax collection, fraud prevention, and transaction management. Paddle's own privacy practices may also apply to payment data — see Paddle's privacy policy for details.</p>
       </LegalSection>
 
       <LegalSection title="5. Cookies">

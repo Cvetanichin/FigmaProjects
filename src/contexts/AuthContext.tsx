@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
-import { PLAN_LIMITS, type Plan } from '../lib/stripe'
+import { PLAN_LIMITS, type Plan } from '../lib/paddle'
 
 interface Profile {
   plan: Plan
