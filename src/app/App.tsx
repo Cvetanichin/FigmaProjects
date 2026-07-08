@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router'
+import { ThemeProvider } from 'next-themes'
 import { AuthProvider, useAuth } from '../contexts/AuthContext'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 
@@ -96,13 +97,15 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </AuthProvider>
-      <SpeedInsights />
-    </ErrorBoundary>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <ErrorBoundary>
+        <AuthProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </AuthProvider>
+        <SpeedInsights />
+      </ErrorBoundary>
+    </ThemeProvider>
   )
 }
